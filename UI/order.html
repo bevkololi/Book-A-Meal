@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  	 <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  	<title>Book A Meal</title>
+  	<link rel="stylesheet" href="assets/stylesheets/main.css">
+  	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Lato:100,300,400">
+  </head>
+  <body>
+  	<header class="primary-header container group">
+  		
+  		<h1 class="logo"><a href="index.html">Book <br> A <br> Meal!</a></h1>
+  		<img src="assets/images/food14.jpg" style='position:absolute; top:0; left:0;' width='200' height='200' alt='the logo'/>
+  		<h3 class="tagline">Where food speaks with your palate.</h3>
+
+      <script>
+// When the user clicks on <div>, open the popup
+    function myFunction() {
+    var popup = document.getElementById("myPopup");
+    popup.classList.toggle("show");
+}
+    </script>
+
+  		<nav class="nav primary-nav">
+	    	<li><a href="index.html">Home</a></li><!--
+	    	--><li><a href="register.html">Sign up</a></li><!--
+	    	--><li><a href="login.html">Sign in</a></li><!--
+	    	--><li><a href="specials.html">Specials</a></li><!--
+	    	--><li><a href="menu.html">Menu</a></li><!--
+	    	--><li><a href="order.html">Order</a></li><!--
+	    	--><li><a href="manage.html">Manage</a></li><!--
+	    	--><li><a href="summary.html">Summary</a></li>
+    	</nav>
+
+	</header>
+
+  
+
+	
+	<!-- This is where you order your meal -->
+
+  	<section class="row">
+  		<div class="grid">
+
+        <!-- A section explaining need to order -->
+
+  <section class="col-2-3">
+
+  <h2>Book a meal!</h2>
+  <h5>For as low as Ksh450</h5>
+
+  <p>We will ensure fast delivery of your meal. Sit back and relax. Let us take care of you.</p>
+
+  <h4>Why Us?</h4>
+
+  <ul class="why-us">
+  <li>Over 30 items in the menu to chose from.</li>
+    <li>Fast delivery</li>
+    <li>World class chefs</li>
+    <li>Affordable prizes</li>
+  </ul>
+
+</section><!--
+--><form class="col-1-3 order" action="#" method="post">
+  <fieldset class="register-group">
+
+    <label>
+      Name
+      <input type="text" name="name" placeholder="Full name" required>
+    </label>
+
+    <label>
+      Phone number
+      <input type="contact" name="phone number" placeholder="Phone number" required>
+    </label>
+
+    <label>
+      Number of plates
+      <select name="quantity" required>
+        <option value="1" selected>1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      
+      </select>
+    </label>
+
+    <label>
+      Special requests
+      <textarea name="comments"></textarea>
+    </label>
+
+  </fieldset>
+  <div class="popup" onclick="myFunction()"><input class="btn1 btn1-default" type="submit" name="submit" value="Order">
+  <span class="popuptext" id="myPopup"> Your order has been received!</span>
+</div> 
+      
+
+  
+</form>
+
+  </div>
+</section>
+
+
+	<!-- Footer -->
+
+	<footer class="primary-footer container group">
+  		<small>&copy; Book a meal</small>
+  		<nav class="nav">
+        <li><a href="index.html">Home</a></li><!--
+        --><li><a href="register.html">Sign up</a></li><!--
+        --><li><a href="login.html">Sign in</a></li><!--
+        --><li><a href="specials.html">Specials</a></li><!--
+        --><li><a href="menu.html">Menu</a></li><!--
+        --><li><a href="order.html">Order</a></li><!--
+        --><li><a href="manage.html">Manage</a></li><!--
+        --><li><a href="admin.html">Summary</a></li>
+      </nav>
+
+	</footer>
+  	
+  </body>
+</html>
