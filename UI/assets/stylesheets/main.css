@@ -65,24 +65,24 @@ table {
 .container,
 .grid {
   margin: 0 auto;
-  width: 960px;
+  width: 100%;
 }
 .container {
-  padding-left: 30px;
-  padding-right: 30px;
+  padding-left: 16%;
+  padding-right: 16%;
 }
 .container {
   margin: 0 auto;
-  padding-left: 30px;
-  padding-right: 30px;
-  width: 960px;
+  padding-left: 16%;
+  padding-right: 16%;
+  width: 100%;
 }
 .grid,
 .col-1-3,
 .col-2-3,
 .col-1-2 {
-  padding-left: 15px;
-  padding-right: 15px;
+  padding-left: 5%;
+  padding-right: 5%;
 }
 .col-1-3,
 .col-2-3,
@@ -243,6 +243,8 @@ p a {
   line-height: 44px;
   padding: 40px 0 22px 0;
   text-transform: uppercase;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .tagline {
@@ -286,7 +288,7 @@ p a {
 
 .row {
   background: #fff;
-  min-width: 960px;
+  max-width: 100%;
   padding: 66px 0 44px 0;
 }
 
@@ -348,84 +350,41 @@ p a {
   Slideshow
   ========================================
 */
-.slider-holder
-        {
-            width: 800px;
-            height: 400px;
-            background-color: yellow;
-            margin-left: auto;
-            margin-right: auto;
-            margin-top: 0px;
-            text-align: center;
-            overflow: hidden;
-        }
-       
-        .image-holder
-        {
-            width: 2400px;
-            background-color: red;
-            height: 400px;
-            clear: both;
-            position: relative;
-           
-            -webkit-transition: left 2s;
-            -moz-transition: left 2s;
-            -o-transition: left 2s;
-            transition: left 2s;
-        }
-       
-        .slider-image
-        {
-            float: left;
-            margin: 0px;
-            padding: 0px;
-            position: relative;
-        }
-       
-        #slider-image-1:target ~ .image-holder
-        {
-            left: 0px;
-        }
-       
-        #slider-image-2:target ~ .image-holder
-        {
-            left: -800px;
-        }
-       
-        #slider-image-3:target ~ .image-holder
-        {
-            left: -1600px;
-        }
+.fling-minislide {
+  width:80%; 
+  height:100%;
+  padding-bottom: 20%;
+  overflow:hidden; 
+  position:relative;
+  padding-left: 5%;
+  /*padding-right: 5%;*/
+  margin: 0 auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+    }
+.fling-minislide img {
+  position:absolute; 
+  animation:fling-minislide 20s infinite; 
+  opacity:0; 
+  width: 80%; 
+  height: 100%; 
+  padding-left: 5%; 
+  /*padding-right: 5%; */
+  margin: 0 auto; 
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  }
 
-        /*#slider-image-4:target ~ .image-holder
-        {
-            left: -2400px;
-        }
-        #slider-image-5:target ~ .image-holder
-        {
-            left: -6400px;
-        }
-        #slider-image-6:target ~ .image-holder
-        {
-            left: -12800px;
-        }*/
+@keyframes fling-minislide {25%{opacity:1;} 40%{opacity:0;}}
+.fling-minislide img:nth-child(6){animation-delay:0s;}
+.fling-minislide img:nth-child(5){animation-delay:4s;}
+.fling-minislide img:nth-child(4){animation-delay:8s;}
+.fling-minislide img:nth-child(3){animation-delay:12s;}
+.fling-minislide img:nth-child(2){animation-delay:16s;}
+.fling-minislide img:nth-child(1){animation-delay:20s;}
 
-
-       
-        .button-holder
-        {
-            position: relative;
-            top: -20px;
-        }
-       
-        .slider-change
-        {
-            display: inline-block;
-            height: 10px;
-            width: 10px;
-            border-radius: 5px;
-            background-color: brown;
-        }
 
 
 
@@ -436,7 +395,7 @@ p a {
 */
 form {
   margin:0 auto;
-  width:350px
+  width: 30%;
 }
 input {
   margin-bottom:3px;
@@ -628,7 +587,10 @@ textarea {
 
 table {
   margin-bottom: 44px;
-  width: 100%;
+  width: 70%;
+  /*margin-right: 15%;*/
+  margin-left: 15%;
+  
 }
 table:last-child {
   margin-bottom: 0;
@@ -699,6 +661,7 @@ table h4 {
 .manage table {
   border-collapse: separate;
   border-spacing: 4px;
+  width: 70%;
 }
 .manage table,
 .manage th,
@@ -710,6 +673,7 @@ table h4 {
 .manage td {
   padding: 10px 15px;
 }
+
 
 
 
