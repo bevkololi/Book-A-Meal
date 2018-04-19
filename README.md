@@ -9,3 +9,9 @@ It contains the following:
 5. A page where the caterer can see:
     The summary of the orders for a  specific day.
     The details for all the orders .
+    
+ 
+Find it on https://bevkololi.github.io or clone the files from https://github.com/bevkololi/Book-A-Meal.git. You can then open index.html file on your browser. Enjoy 
+
+
+
