@@ -13,14 +13,6 @@
   		<img src="assets/images/food14.jpg" style='position:absolute; top:0; left:0;' width='15%' height='26%' alt='the logo'/>
   		<h3 class="tagline">Where food speaks with your palate.</h3>
 
-      <script>
-// When the user clicks on <div>, open the popup
-    function myFunction() {
-    var popup = document.getElementById("myPopup");
-    popup.classList.toggle("show");
-}
-    </script>
-
   		<nav class="nav primary-nav">
 	    	<li><a href="index.html">Home</a></li><!--
 	    	--><li><a href="register.html">Sign up</a></li><!--
@@ -37,71 +29,43 @@
   
 
 	
-	<!-- This is where you order your meal -->
+	<!-- User login and register -->
 
   	<section class="row">
   		<div class="grid">
 
-        <!-- A section explaining need to order -->
+  		<!-- Form for caterer to add meal -->
 
-  <section class="col-2-3">
-
-  <h2>Book a meal!</h2>
-  <h5>For as low as Ksh450</h5>
-
-  <p>We will ensure fast delivery of your meal. Sit back and relax. Let us take care of you.</p>
-
-  <h4>Why Us?</h4>
-
-  <ul class="why-us">
-  <li>Over 30 items in the menu to chose from.</li>
-    <li>Fast delivery</li>
-    <li>World class chefs</li>
-    <li>Affordable prizes</li>
-  </ul>
-
-</section><!--
---><form class="col-1-3 order" action="#" method="post">
+      <section class="teaser">
+      <h1 align=center> Add Meal</h1>
+        <form action="#" method="post">
   <fieldset class="register-group">
 
     <label>
-      Name
-      <input type="text" name="name" placeholder="Full name" required>
+      Name of Meal
+      <input type="text" name="name" placeholder="Name of meal" required>
     </label>
 
-    <label>
-      Phone number
-      <input type="contact" name="phone number" placeholder="Phone number" required>
-    </label>
+    
 
     <label>
-      Number of plates
-      <select name="quantity" required>
-        <option value="1" selected>1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-      
-      </select>
-    </label>
-
-    <label>
-      Special requests
-      <textarea name="comments"></textarea>
+      Description
+      <textarea name="Ingredients and description"></textarea>
     </label>
 
   </fieldset>
-  <div class="popup" onclick="myFunction()"><input class="btn1 btn1-alt" type="submit" name="submit" value="Order">
-  <span class="popuptext" id="myPopup"> Your order has been received!</span>
+  <div class="popup" onclick="myFunction()"><input class="btn2 btn2-alt" type="submit" name="submit" value="Add Meal">
+  <span class="popuptext" id="myPopup">The meal has been added!</span>
 </div> 
       
 
   
 </form>
+      </section>
 
-  </div>
-</section>
+
+      </div>
+    </section>
 
 
 	<!-- Footer -->

@@ -443,7 +443,7 @@ label {
   text-transform: uppercase;
 }
 .btn1-alt {
-  border: 1px solid #CCC;
+  border: 1px solid #000c35;
   padding: 10px 30px;
 }
 .btn1-alt:hover {
@@ -467,7 +467,7 @@ label {
   width: 150px;
 }
 .btn2-alt {
-  border: 1px solid #CCC;
+  border: 1px solid #000c35;
   padding: 10px 30px;
 }
 .btn2-alt:hover {
