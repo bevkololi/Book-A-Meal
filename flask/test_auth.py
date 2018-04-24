@@ -3,7 +3,7 @@ import unittest
 import json
 
 from app import app
-from app.models import users
+from app.models import user1
 
 class AuthTestCase(unittest.TestCase):
     """Test case for the authentication of users"""
