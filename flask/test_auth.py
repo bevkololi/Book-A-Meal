@@ -14,11 +14,11 @@ class AuthTestCase(unittest.TestCase):
         self.app = app.app.test_client()
         self.app.testing = True
         self.user_data = {
+
             'email': 'bev@gmail.com',
             'password': 'pass1234'
         }
-        """Test registration and test user already exists has an error i.e routes not available yet... expecting string"""
-        
+                
 
     def test_registration(self):
         """Test user registration works correcty."""
@@ -55,6 +55,7 @@ class AuthTestCase(unittest.TestCase):
             'password': 'pass9876'
         }
         res = self.app.post('api/v1/auth/login', data=not_a_user)
+        
         result = json.loads(res.data)
         self.assertEqual(res.status_code, 401)
         self.assertEqual(
