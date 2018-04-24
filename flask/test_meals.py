@@ -3,6 +3,7 @@ import unittest
 import json
 
 from app import app
+from app.models import meals1
 
 
 
@@ -13,7 +14,7 @@ BAD_ITEM_URL = '{}/5'.format(BASE_URL)
 GOOD_ITEM_URL = '{}/3'.format(BASE_URL)
 
 
-class TestFlaskApi(unittest.TestCase):
+class TestMeals(unittest.TestCase):
 
     def setUp(self):
         self.backup_meals = deepcopy(app.meals)  
@@ -22,13 +23,13 @@ class TestFlaskApi(unittest.TestCase):
 
     def test_get_all(self):
         response = self.app.get(BASE_URL)
-        data = json.loads(response.get_data())
+        data = meals1 # This  has been described as : Meal(1, "Ugali and fish", "Ugali, fish, vegetables, spices", 150)#
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data['meals']), 3)
 
     def test_get_one(self):
         response = self.app.get(BASE_URL)
-        data = json.loads(response.get_data())
+        data = meals1
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['meals'][0]['name'], 'Ugali and fish')
 
