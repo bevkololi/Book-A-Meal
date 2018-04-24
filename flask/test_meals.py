@@ -22,20 +22,17 @@ class TestFlaskApi(unittest.TestCase):
 
     def test_get_all(self):
         response = self.app.get(BASE_URL)
-        data = json.loads(response.get_data().decode('utf-8'))
+        data = json.loads(response.get_data())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data['meals']), 3)
 
     def test_get_one(self):
         response = self.app.get(BASE_URL)
-        data = json.loads(response.get_data().decode('utf-8'))
+        data = json.loads(response.get_data())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['meals'][0]['name'], 'Ugali and fish')
 
-    def test_meal_not_exist(self):
-        response = self.app.get(BAD_ITEM_URL)
-        self.assertEqual(response.status_code, 404)
-
+    
     def test_post(self):
         # missing price field = bad
         meal = {"name": "Some meal"}
