@@ -16,7 +16,7 @@ GOOD_ITEM_URL = '{}/3'.format(BASE_URL)
 class TestFlaskApi(unittest.TestCase):
 
     def setUp(self):
-        self.backup_meals = deepcopy(app.meals)  # no references!
+        self.backup_meals = deepcopy(app.meals)  
         self.app = app.app.test_client()
         self.app.testing = True
 
@@ -34,13 +34,12 @@ class TestFlaskApi(unittest.TestCase):
 
     
     def test_post(self):
-        # missing price field = bad
         meal = {"name": "Some meal"}
         response = self.app.post(BASE_URL,
                                  data=json.dumps(meal),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
-        # value field cannot take str
+        #price field cannot take str#
         meal = {"name": "A meal", "price": 'string'}
         response = self.app.post(BASE_URL,
                                  data=json.dumps(meal),
@@ -55,7 +54,7 @@ class TestFlaskApi(unittest.TestCase):
         data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(data['meal']['id'], 4)
         self.assertEqual(data['meal']['name'], 'A meal')
-        # cannot add item with same name again
+        # cannot add meal with same name again
         meal = {"name": "A meal", "price": 70}
         response = self.app.post(BASE_URL,
                                  data=json.dumps(meal),
@@ -70,8 +69,6 @@ class TestFlaskApi(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(data['meal']['ingredients'], "Pork and spaghetti")
-        # proof need for deepcopy in setUp: update app.meals should not affect self.backup_meals
-        # this fails when you use shallow copy
         self.assertEqual(self.backup_meals[2]['ingredients'], "Unripe cooked banana, stew, mutton, appetizer")  # org value
 
     def test_update_error(self):

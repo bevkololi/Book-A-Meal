@@ -45,14 +45,7 @@ def create_app(config_name):
       return [user for user in users if user["email"] == email]
 
 
-    @app.errorhandler(404)
-    def not_found(error):
-        return make_response(jsonify({'error': NOT_FOUND}), 404)
-
-
-    @app.errorhandler(400)
-    def bad_request(error):
-        return make_response(jsonify({'error': BAD_REQUEST}), 400)
+    
     
 
 
