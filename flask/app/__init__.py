@@ -1,15 +1,6 @@
-# app/__init__.py
-
 # third-party imports
 from flask import Flask
 from flask_api import FlaskAPI
-from flask_sqlalchemy import SQLAlchemy
-from flask import request, jsonify, abort
-from flask import Flask, jsonify, abort, make_response, request
-from flask_bcrypt import Bcrypt
-from flask import current_app
-import jwt
-from datetime import datetime, timedelta
 
 from instance.config import app_config
 
