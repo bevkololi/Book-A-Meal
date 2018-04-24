@@ -3,7 +3,7 @@ import unittest
 import json
 
 from app import app
-from app.models import users
+from app.models import user1
 
 class AuthTestCase(unittest.TestCase):
     """Test case for the authentication of users"""
@@ -23,7 +23,7 @@ class AuthTestCase(unittest.TestCase):
     def test_registration(self):
         """Test user registration works correcty."""
         res = self.app.post('api/v1/auth/signup', data=self.user_data)
-        result = json.loads(res.data.decode())
+        result = user1
         self.assertEqual(
             result['message'], "Sign up successful. Please login.")
         self.assertEqual(res.status_code, 201)
