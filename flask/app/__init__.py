@@ -44,6 +44,13 @@ def create_app(config_name):
     def get_meals():
         return jsonify({'meals': meals})
 
+    @app.route('/api/v1/meals/<int:id>', methods=['GET'])
+    def get_meal(id):
+        meal = _get_meal(id)
+        if not meal:
+            abort(404)
+        return jsonify({'meal': meal})
+
 
 
     return app
