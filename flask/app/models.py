@@ -50,24 +50,26 @@ users = (json.dumps(allusers, default=jdefault))
 
 class Order:
 
-    def __init__(self, username.User, description, price, id=0):
+    def __init__(self, username, description, price, id=0):
         self.id = id
-        self.name = name
-        self.ingredients = ingredients
+        self.username = username
+        self.description = description
         self.price = price
 
 
-meals1 = Meal(1, "Ugali and fish", "Ugali, fish, vegetables, spices", 150)
-meals2 = Meal(1, "Ugali and fish", "Ugali, fish, vegetables, spices", 150)
-meals3 = Meal(3, "Matoke and mutton", "Unripe cooked banana, stew, mutton, appetizer", 250)
+order1 = Order(1, "Mike sonko", "Ugali, fish, vegetables, spices", 150)
+order2 = Order(1, "Jim Mugabe", "Ugali, fish, vegetables, spices", 150)
+order3 = Order(3, "Ian Njagi", "Unripe cooked banana, stew, mutton, appetizer", 250)
 
 def jdefault(o):
     return o.__dict__
 
-allmeals = []
-allmeals.append(meals1)
-allmeals.append(meals2)
-allmeals.append(meals3)
+allorders = []
+allorders.append(order1)
+allorders.append(order2)
+allorders.append(order3)
+
+orders = (json.dumps(allorders, default=jdefault))
 
 
 

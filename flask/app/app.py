@@ -13,6 +13,7 @@ BAD_REQUEST = 'Bad request'
 
 from app.models import meals
 from app.models import users
+from app.models import orders
 
 
 def _get_meal(id):
@@ -21,6 +22,14 @@ def _get_meal(id):
 
 def _meal_exists(name):
     return [meal for meal in meals if meal["name"] == name]
+
+
+def _get_user(id):
+    return [user for user in users if user[id] == id]
+
+
+def _user_exists(email):
+    return [user for user in users if user["email"] == email]
 
 
 
