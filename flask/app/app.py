@@ -12,6 +12,7 @@ NOT_FOUND = 'Not found'
 BAD_REQUEST = 'Bad request'
 
 from app.models import meals
+from app.models import users
 
 # meals = [
 #     {

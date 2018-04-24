@@ -2,47 +2,6 @@
 import datetime # we will use this for date objects
 import json
 
-# meals = [
-#     {
-#         'id': 1,
-#         'name': 'Ugali and fish',
-#         'ingredients': 'Ugali, fish, vegetables, spices',
-#         'Price': 150,
-#     },
-#     {
-#         'id': 2,
-#         'name': 'Rice and beef',
-#         'ingredients': 'Cooked rice, salad, stewed beef',
-#         'price': 320,
-#     },
-#     {
-#         'id': 3,
-#         'name': 'Matoke and mutton',
-#         'ingredients': 'Unripe cooked banana, stew, mutton, appetizer',
-#         'price': 250,
-#     },
-# ]
-
-# allorders = [
-#     {
-#         'id': 1,
-#         'username': 'Bev Kololi',
-#         'order':'Ugali and fish',        
-#         'Price': 150,
-#     },
-#     {
-#         'id': 2,
-#         'username': 'Ann Ann',
-#         'order': 'Rice stewed beef',
-#         'price': 320,
-#     },
-#     {
-#         'id': 3,
-#         'username': 'Jay Kiarie',
-#         'order': 'Matoke and matumbo',
-#         'price': 250,
-#     },
-# ]
 
 class Meal:
 
@@ -53,28 +12,58 @@ class Meal:
         self.price = price
 
 
-meals1 = Meal(1, 
-        "Ugali and fish", 
-        "Ugali, fish, vegetables, spices", 
-        150)
+meals1 = Meal(1, "Ugali and fish", "Ugali, fish, vegetables, spices", 150)
 meals2 = Meal(1, "Ugali and fish", "Ugali, fish, vegetables, spices", 150)
 meals3 = Meal(3, "Matoke and mutton", "Unripe cooked banana, stew, mutton, appetizer", 250)
 
-
-    
 def jdefault(o):
     return o.__dict__
 
 allmeals = []
-allmeals.append(Meal(1, "Ugali and fish", "Ugali, fish, vegetables, spices", 150))
-allmeals.append(Meal(2, "Rice and beef", "Cooked rice, salad, stewed beef", 320))
-allmeals.append(Meal(3, "Matoke and mutton", "Unripe cooked banana, stew, mutton, appetizer", 250))
+allmeals.append(meals1)
+allmeals.append(meals2)
+allmeals.append(meals3)
 
 
 meals = (json.dumps(allmeals, default=jdefault))
 
 
-# print (meals)
+class User:
+    def __init__(self, username, email, password, caterer=False, id=0):
+        self.id = id
+        self.username = username
+        self.email = email
+        self.password = password
+        self.caterer = caterer
+
+allusers=[]
+
+user1 = User(1, "Mike Sonko", "sonko@gmail.com", "pass1234", True)
+user2 = User(2, "Jim Mugabe", "mugabe@gmail.com", "pass2222", False)
+user3 = User(3, "Ian Njagi", "njagi@gmail.com", "pass", False)
+
+allusers.append(user1)
+allusers.append(user2)
+allusers.append(user3)
+
+
+users = (json.dumps(allusers, default=jdefault))
+
+
+
+
+
+
+              
+
+
+
+
+
+    
+
+
+# print (users)
         
 
 # meals=[]
