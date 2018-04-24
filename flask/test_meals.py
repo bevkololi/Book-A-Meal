@@ -24,7 +24,7 @@ class TestFlaskApi(unittest.TestCase):
         response = self.app.get(BASE_URL)
         data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data['meals']), 3)
+        self.assertEqual(len(data['meals']), 1)
 
     def test_get_one(self):
         response = self.app.get(BASE_URL)

@@ -51,6 +51,23 @@ def create_app(config_name):
             abort(404)
         return jsonify({'meal': meal})
 
+    @app.route('/api/v1/meals', methods=['POST'])
+    def create_meal():
+        if not request.json or 'name' not in request.json or 'ingredients' not in request.json or 'price' not in request.json:
+            abort(400)
+        meal_id = meals[-1].get("id") + 1
+        name = request.json.get('name')
+        ingredients = request.json.get('ingredients')
+        if _meal_exists(name):
+            abort(400)
+        price = request.json.get('price')
+        if type(price) is not int:
+            abort(400)
+        meal = {"id": meal_id, "name": name,
+                "ingredients": ingredients,"price": price}
+        meals.append(meal)
+        return jsonify({'meal': meal}), 201
+
 
 
     return app
