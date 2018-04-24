@@ -40,5 +40,10 @@ def create_app(config_name):
         return make_response(jsonify({'error': BAD_REQUEST}), 400)
 
 
+    @app.route('/api/v1/meals', methods=['GET'])
+    def get_meals():
+        return jsonify({'meals': meals})
+
+
 
     return app
