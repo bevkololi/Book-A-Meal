@@ -41,21 +41,47 @@ def get_meal(id):
     return jsonify({'meal': meal})
 
 @app.route('/api/v1/meals', methods=['POST'])
-    def create_meal():
-        if not request.json or 'name' not in request.json or 'ingredients' not in request.json or 'price' not in request.json:
-            abort(400)
-        meal_id = meals[-1].get("id") + 1
-        name = request.json.get('name')
-        ingredients = request.json.get('ingredients')
-        if _meal_exists(name):
-            abort(400)
-        price = request.json.get('price')
-        if type(price) is not int:
-            abort(400)
-        meal = {"id": meal_id, "name": name,
-                "ingredients": ingredients,"price": price}
-        meals.append(meal)
-        return jsonify({'meal': meal}), 201
+def create_meal():
+    if not request.json or 'name' not in request.json or 'ingredients' not in request.json or 'price' not in request.json:
+        abort(400)
+    meal_id = meals[-1].get("id") + 1
+    name = request.json.get('name')
+    ingredients = request.json.get('ingredients')
+    if _meal_exists(name):
+        abort(400)
+    price = request.json.get('price')
+    if type(price) is not int:
+        abort(400)
+    meal = {"id": meal_id, "name": name,
+            "ingredients": ingredients,"price": price}
+    meals.append(meal)
+    return jsonify({'meal': meal}), 201
+
+@app.route('/api/v1/meals/<int:id>', methods=['PUT'])
+def update_meal(id):
+    meal = _get_meal(id)
+    if len(meal) == 0:
+        abort(404)
+    if not request.json:
+        abort(400)
+    name = request.json.get('name', meal[0]['name'])
+    ingredients = request.json.get('ingredients', meal[0]['ingredients'])
+    price = request.json.get('price', meal[0]['price'])
+    if type(price) is not int:
+        abort(400)
+    meal[0]['name'] = name
+    meal[0]['ingredients'] = ingredients
+    meal[0]['price'] = price
+    return jsonify({'meal': meal[0]}), 200
+
+
+@app.route('/api/v1/meals/<int:id>', methods=['DELETE'])
+def delete_meal(id):
+    meal = _get_meal(id)
+    if len(meal) == 0:
+        abort(404)
+    meals.remove(meal[0])
+    return jsonify({}), 204
 
 
 
