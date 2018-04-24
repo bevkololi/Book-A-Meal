@@ -24,7 +24,7 @@ class TestFlaskApi(unittest.TestCase):
         response = self.app.get(BASE_URL)
         data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data['meals']), 1)
+        self.assertEqual(len(data['meals']), 3)
 
     def test_get_one(self):
         response = self.app.get(BASE_URL)
@@ -59,20 +59,20 @@ class TestFlaskApi(unittest.TestCase):
         self.assertEqual(data['meal']['id'], 4)
         self.assertEqual(data['meal']['name'], 'A meal')
         # cannot add item with same name again
-        meal = {"title": "A meal", "yr_of_pub": 70}
+        meal = {"name": "A meal", "price": 70}
         response = self.app.post(BASE_URL,
                                  data=json.dumps(meal),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
     def test_update(self):
-        meal = {"ingridients": "Pork and spaghetti"}
+        meal = {"ingredients": "Pork and spaghetti"}
         response = self.app.put(GOOD_ITEM_URL,
                                 data=json.dumps(meal),
                                 content_type='application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.get_data().decode('utf-8'))
-        self.assertEqual(data['meal']['ingredients'], "Unripe cooked banana, stew, mutton, appetizer")
+        self.assertEqual(data['meal']['ingredients'], "Pork and spaghetti")
         # proof need for deepcopy in setUp: update app.meals should not affect self.backup_meals
         # this fails when you use shallow copy
         self.assertEqual(self.backup_meals[2]['ingredients'], "Unripe cooked banana, stew, mutton, appetizer")  # org value

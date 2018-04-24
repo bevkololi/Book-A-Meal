@@ -1,15 +1,36 @@
 from flask_api import FlaskAPI
 from flask import Flask, jsonify, abort, make_response, request
+# from flask_sqlalchemy import SQLAlchemy
 
-from app.models import meals
 
+
+# from instance.config import app_config
 
 app = Flask(__name__)
 
 NOT_FOUND = 'Not found'
 BAD_REQUEST = 'Bad request'
 
-
+meals = [
+    {
+        'id': 1,
+        'name': 'Ugali and fish',
+        'ingredients': 'Ugali, fish, vegetables, spices',
+        'Price': 150,
+    },
+    {
+        'id': 2,
+        'name': 'Rice and beef',
+        'ingredients': 'Cooked rice, salad, stewed beef',
+        'price': 320,
+    },
+    {
+        'id': 3,
+        'name': 'Matoke and mutton',
+        'ingredients': 'Unripe cooked banana, stew, mutton, appetizer',
+        'price': 250,
+    },
+]
 def _get_meal(id):
     return [meal for meal in meals if meal['id'] == id]
 
@@ -40,6 +61,7 @@ def get_meal(id):
         abort(404)
     return jsonify({'meal': meal})
 
+
 @app.route('/api/v1/meals', methods=['POST'])
 def create_meal():
     if not request.json or 'name' not in request.json or 'ingredients' not in request.json or 'price' not in request.json:
@@ -57,6 +79,7 @@ def create_meal():
     meals.append(meal)
     return jsonify({'meal': meal}), 201
 
+
 @app.route('/api/v1/meals/<int:id>', methods=['PUT'])
 def update_meal(id):
     meal = _get_meal(id)
@@ -72,6 +95,7 @@ def update_meal(id):
     meal[0]['name'] = name
     meal[0]['ingredients'] = ingredients
     meal[0]['price'] = price
+
     return jsonify({'meal': meal[0]}), 200
 
 
@@ -82,7 +106,6 @@ def delete_meal(id):
         abort(404)
     meals.remove(meal[0])
     return jsonify({}), 204
-
 
 
 if __name__ == '__main__':

@@ -1,4 +1,6 @@
-# third-party imports I'll need
+# app/__init__.py
+
+# third-party imports
 from flask import Flask
 from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
@@ -11,8 +13,14 @@ from datetime import datetime, timedelta
 
 from instance.config import app_config
 
+
+
+
 NOT_FOUND = 'Not found'
 BAD_REQUEST = 'Bad request'
+
+
+
 
 def create_app(config_name):
     from app.models import meals
@@ -29,6 +37,17 @@ def create_app(config_name):
     def _meal_exists(name):
       return [meal for meal in meals if meal["name"] == name]
 
+    def _get_user(id):
+      return [user for user in users if user['id'] == id]
+
+
+    def _user_exists(email):
+      return [user for user in users if user["email"] == email]
+
+
+    
+
+
 
     @app.errorhandler(404)
     def not_found(error):
@@ -44,12 +63,15 @@ def create_app(config_name):
     def get_meals():
         return jsonify({'meals': meals})
 
+
     @app.route('/api/v1/meals/<int:id>', methods=['GET'])
     def get_meal(id):
         meal = _get_meal(id)
         if not meal:
             abort(404)
         return jsonify({'meal': meal})
+
+
 
     @app.route('/api/v1/meals', methods=['POST'])
     def create_meal():
@@ -68,32 +90,34 @@ def create_app(config_name):
         meals.append(meal)
         return jsonify({'meal': meal}), 201
 
+
     @app.route('/api/v1/meals/<int:id>', methods=['PUT'])
-	def update_meal(id):
-	    meal = _get_meal(id)
-	    if len(meal) == 0:
-	        abort(404)
-	    if not request.json:
-	        abort(400)
-	    name = request.json.get('name', meal[0]['name'])
-	    ingredients = request.json.get('ingredients', meal[0]['ingredients'])
-	    price = request.json.get('price', meal[0]['price'])
-	    if type(price) is not int:
-	        abort(400)
-	    meal[0]['name'] = name
-	    meal[0]['ingredients'] = ingredients
-	    meal[0]['price'] = price
-	    return jsonify({'meal': meal[0]}), 200
+    def update_meal(id):
+        meal = _get_meal(id)
+        if len(meal) == 0:
+            abort(404)
+        if not request.json:
+            abort(400)
+        name = request.json.get('name', meal[0]['name'])
+        ingredients = request.json.get('ingredients', meal[0]['ingredients'])
+        price = request.json.get('price', meal[0]['price'])
+        if type(price) is not int:
+            abort(400)
+        meal[0]['name'] = name
+        meal[0]['ingredients'] = ingredients
+        meal[0]['price'] = price
+        return jsonify({'meal': meal[0]}), 200
 
 
-	@app.route('/api/v1/meals/<int:id>', methods=['DELETE'])
-	def delete_meal(id):
-	    meal = _get_meal(id)
-	    if len(meal) == 0:
-	        abort(404)
-	    meals.remove(meal[0])
-	    return jsonify({}), 204
-
+    @app.route('/api/v1/meals/<int:id>', methods=['DELETE'])
+    def delete_meal(id):
+        meal = _get_meal(id)
+        if len(meal) == 0:
+            abort(404)
+        meals.remove(meal[0])
+        return jsonify({}), 204
 
 
     return app
+
+    
