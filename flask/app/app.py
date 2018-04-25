@@ -11,9 +11,8 @@ app = Flask(__name__)
 NOT_FOUND = 'Not found'
 BAD_REQUEST = 'Bad request'
 
-from app.models import meals
-from app.models import users
-from app.models import orders
+from app.models import meals, users, orders, Meal, menu
+
 
 
 def _get_meal(id):
@@ -30,6 +29,19 @@ def _get_user(id):
 
 def _user_exists(email):
     return [user for user in users if user["email"] == email]
+
+@app.route('/api/v1/meals', methods=['GET'])
+    def get_meals():
+        return jsonify({'meals': meals})
+
+
+@app.route('/api/v1/meals/<int:id>', methods=['GET'])
+def get_meal(id):
+    meal = _get_meal(id)
+    if not meal:
+        abort(404)
+    return jsonify({'meal': meal})
+
 
 
 

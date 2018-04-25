@@ -1,10 +1,16 @@
 
 import json
+from datetime import datetime, date, timedelta
+from collections import OrderedDict
 
+class BaseModel:   
+    @classmethod
+    def create_dict(o):
+        return o.__dict__
 
-class Meal:
+class Meal(BaseModel):
 
-    def __init__(self, name, ingredients, price, id=0):
+    def __init__(self, name, ingredients, price, id):
         self.id = id
         self.name = name
         self.ingredients = ingredients
@@ -12,8 +18,10 @@ class Meal:
 
 
 meals1 = Meal(1, "Ugali and fish", "Ugali, fish, vegetables, spices", 150)
-meals2 = Meal(1, "Ugali and fish", "Ugali, fish, vegetables, spices", 150)
+meals2 = Meal(2, "Ugali and fish", "Ugali, fish, vegetables, spices", 150)
 meals3 = Meal(3, "Matoke and mutton", "Unripe cooked banana, stew, mutton, appetizer", 250)
+
+#print out to ensure you're doing the correct thing
 
 def jdefault(o):
     return o.__dict__
@@ -24,22 +32,23 @@ allmeals.append(meals2)
 allmeals.append(meals3)
 
 
-meals = (json.dumps(allmeals, default=jdefault))
+mealstr = (json.dumps(allmeals, default=jdefault,  indent=4))
+meals = (json.loads(mealstr))
 
 
-class User:
-    def __init__(self, username, email, password, caterer=False, id=0):
-        self.id = id
+class User(BaseModel):
+    def __init__(self, user_id, username, email, password):
+        self.user_id = user_id
         self.username = username
         self.email = email
         self.password = password
-        self.caterer = caterer
+        
 
 allusers=[]
 
-user1 = User(1, "Mike Sonko", "sonko@gmail.com", "pass1234", True)
-user2 = User(2, "Jim Mugabe", "mugabe@gmail.com", "pass2222", False)
-user3 = User(3, "Ian Njagi", "njagi@gmail.com", "pass", False)
+user1 = User(1, "Mike Sonko", "sonko@gmail.com", "pass1234")
+user2 = User(2, "Jim Mugabe", "mugabe@gmail.com", "pass2222")
+user3 = User(3, "Ian Njagi", "njagi@gmail.com", "pass8888")
 
 allusers.append(user1)
 allusers.append(user2)
@@ -48,18 +57,41 @@ allusers.append(user3)
 
 users = (json.dumps(allusers, default=jdefault))
 
-class Order:
 
-    def __init__(self, username, description, price, id=0):
-        self.id = id
+class Caterer(User):
+    def __init__(self, username, email, password, caterer=True):
+        super().__init__(self, username, email, password)
+        self.caterer = caterer
+caterer1 = Caterer ("Mike Sonko", "sonko@gmail.com", "pass1234", "Caterer")
+
+
+
+class Menu(BaseModel):
+    today = datetime.utcnow().date()
+    
+themenu=[]
+def add_to_menu(themenu, meal):
+    themenu.append(meal)
+    return themenu
+
+
+meal_in_menu = add_to_menu(themenu, meals1)
+meal_in_menu = add_to_menu(themenu, meals3)
+mealinmenustr = (json.dumps(meal_in_menu, default=jdefault,  indent=4, sort_keys=True))
+menu = (json.loads(mealinmenustr))
+    
+
+    
+class Order(BaseModel):
+    def __init__(self, username, meal, quantity):
         self.username = username
-        self.description = description
-        self.price = price
+        self.meal = meal
+        self.quantity = quantity
 
 
-order1 = Order(1, "Mike sonko", "Ugali, fish, vegetables, spices", 150)
-order2 = Order(1, "Jim Mugabe", "Ugali, fish, vegetables, spices", 150)
-order3 = Order(3, "Ian Njagi", "Unripe cooked banana, stew, mutton, appetizer", 250)
+order1 = Order("Angie Kihara", "Pilau and chicken", 2)
+order2 = Order("Victor Kubo", "Ugali, fish, vegetables, spices", 1)
+order3 = Order("Charles Ngara","Unripe cooked banana, stew, mutton, appetizer", 4)
 
 def jdefault(o):
     return o.__dict__
@@ -69,7 +101,32 @@ allorders.append(order1)
 allorders.append(order2)
 allorders.append(order3)
 
-orders = (json.dumps(allorders, default=jdefault))
+orderstr = (json.dumps(allorders, default=jdefault,  indent=4, sort_keys=True))
+orders = (json.loads(orderstr))
+
+class DB:
+    def __init__(self):
+        self.meals = []
+        self.users = []
+        self.caterers = []
+        self.orders = []
+        self.todays_menu = []
+        
+
+
+    def additems(self, item):
+        if isinstance(item, User):
+            self.users.append(item)
+        elif isinstance(item, caterers):
+            self.caterers.append(item)
+        elif isinstance(item, Meal):
+            self.meals.append(item)
+        elif isinstance(item, Menu):
+            self.todays_menu.append(item)
+        elif isinstance(item, Order):
+            self.orders.append(item)
+        else:
+            return 'This is an uknown object'
 
 
 
@@ -77,7 +134,7 @@ orders = (json.dumps(allorders, default=jdefault))
 
               
 
-
+print(meals)
 
 
 
