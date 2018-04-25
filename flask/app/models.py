@@ -5,8 +5,8 @@ from collections import OrderedDict
 
 class BaseModel:   
     @classmethod
-    def create_dict(o):
-        return o.__dict__
+    def create_dict(cls):
+        return cls.__dict__
 
 class Meal(BaseModel):
 
@@ -68,7 +68,7 @@ caterer1 = Caterer ("Mike Sonko", "sonko@gmail.com", "pass1234", "Caterer")
 
 class Menu(BaseModel):
     today = datetime.utcnow().date()
-    
+
 themenu=[]
 def add_to_menu(themenu, meal):
     themenu.append(meal)
@@ -104,29 +104,6 @@ allorders.append(order3)
 orderstr = (json.dumps(allorders, default=jdefault,  indent=4, sort_keys=True))
 orders = (json.loads(orderstr))
 
-class DB:
-    def __init__(self):
-        self.meals = []
-        self.users = []
-        self.caterers = []
-        self.orders = []
-        self.todays_menu = []
-        
-
-
-    def additems(self, item):
-        if isinstance(item, User):
-            self.users.append(item)
-        elif isinstance(item, caterers):
-            self.caterers.append(item)
-        elif isinstance(item, Meal):
-            self.meals.append(item)
-        elif isinstance(item, Menu):
-            self.todays_menu.append(item)
-        elif isinstance(item, Order):
-            self.orders.append(item)
-        else:
-            return 'This is an uknown object'
 
 
 

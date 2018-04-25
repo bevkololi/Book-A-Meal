@@ -3,7 +3,7 @@ import unittest
 import json
 
 from app import app
-from app.models import meals1
+from app.models import meals1, meals
 
 
 
@@ -23,13 +23,14 @@ class TestMeals(unittest.TestCase):
 
     def test_get_all(self):
         response = self.app.get(BASE_URL)
-        data = meals1 # This  has been described as : Meal(1, "Ugali and fish", "Ugali, fish, vegetables, spices", 150)#
+        data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data['meals']), 3)
+        
 
     def test_get_one(self):
         response = self.app.get(BASE_URL)
-        data = meals1
+        data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['meals'][0]['name'], 'Ugali and fish')
 
