@@ -42,7 +42,7 @@ class AuthTestCase(unittest.TestCase):
 
     def test_user_login(self):
         """Test signed up user can login."""
-        res = self.app.post('auth/login', data=self.user_data)
+        res = self.app.get('auth/login', data=self.user_data)
         self.assertEqual(res.status_code, 201)
         login_res = self.client().post('api/v1/auth/login', data=self.user_data)
         result = json.loads(login_res.data.decode())

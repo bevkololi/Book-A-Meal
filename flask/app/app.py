@@ -165,7 +165,7 @@ def get_by_email(email):
             return user
 
 #Endpoint for login
-@app.route('/auth/login')
+@app.route('/auth/login', methods=['GET'])
 def login():
     user = {
             'user_id':3,
