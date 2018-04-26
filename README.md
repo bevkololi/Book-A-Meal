@@ -50,6 +50,7 @@ The following are the API endpoints used in the application:
 5. /api/v1/orders: To get all the orders
 6: /api/v1/orders/<username>: To get orders by a particular customer
     
+
 The endpoints have been tested on postman. Here are the expected outcomes:
 
 ![screenshot 26](https://user-images.githubusercontent.com/26184534/39310723-d0b7a332-4973-11e8-82d3-6e39738f1c31.png)
