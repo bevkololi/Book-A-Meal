@@ -18,7 +18,7 @@ class Meal(BaseModel):
 
 
 meals1 = Meal(1, "Ugali and fish", "Ugali, fish, vegetables, spices", 150)
-meals2 = Meal(2, "Ugali and fish", "Ugali, fish, vegetables, spices", 150)
+meals2 = Meal(2, "Rice and beef", "Ugali, fish, vegetables, spices", 150)
 meals3 = Meal(3, "Matoke and mutton", "Unripe cooked banana, stew, mutton, appetizer", 250)
 
 #print out to ensure you're doing the correct thing
@@ -32,16 +32,40 @@ allmeals.append(meals2)
 allmeals.append(meals3)
 
 
-mealstr = (json.dumps(allmeals, default=jdefault,  indent=4))
-meals = (json.loads(mealstr))
+
+mealstr = (json.dumps(allmeals, default=jdefault, sort_keys=True,
+                 indent=4, separators=(',', ': ')))
+mealsunordered = (json.loads(mealstr))
+
+meals = [
+    {
+        'id': 1,
+        'name': 'Ugali and fish',
+        'ingredients': 'Ugali, fish, vegetables, spices',
+        'price': 150,
+    },
+    {
+        'id': 2,
+        'name': 'Rice and beef',
+        'ingredients': 'Cooked rice, salad, stewed beef',
+        'price': 320,
+    },
+    {
+        'id': 3,
+        'name': 'Matoke and mutton',
+        'ingredients': 'Unripe cooked banana, stew, mutton, appetizer',
+        'price': 250,
+    },
+]
 
 
 class User(BaseModel):
-    def __init__(self, user_id, username, email, password):
+    def __init__(self, user_id, username, email, password, caterer=False):
         self.user_id = user_id
         self.username = username
         self.email = email
         self.password = password
+        self.caterer = caterer
         
 
 allusers=[]
@@ -55,7 +79,8 @@ allusers.append(user2)
 allusers.append(user3)
 
 
-users = (json.dumps(allusers, default=jdefault))
+userstr = (json.dumps(allusers, default=jdefault))
+users = (json.loads(userstr))
 
 
 class Caterer(User):
@@ -111,7 +136,7 @@ orders = (json.loads(orderstr))
 
               
 
-print(meals)
+# print(users)
 
 
 

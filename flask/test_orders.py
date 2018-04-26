@@ -4,7 +4,7 @@ import json
 
 from app import app
 
-from app.models import order1
+
 
 
 
@@ -23,15 +23,15 @@ class TestOrders(unittest.TestCase):
 
     def test_get_all(self):
         response = self.app.get(BASE_URL)
-        data = order1
+        data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data['orders']), 3)
 
     def test_get_one(self):
         response = self.app.get(BASE_URL)
-        data = order1
+        data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['orders'][0]['username'], 'Mike Sonko')
+        self.assertEqual(data['orders'][0]['username'], 'Angie Kihara')
 
     
     

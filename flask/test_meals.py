@@ -3,7 +3,7 @@ import unittest
 import json
 
 from app import app
-from app.models import meals1, meals
+from app.models import meals
 
 
 
