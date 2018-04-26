@@ -8,22 +8,17 @@ from functools import wraps
 import jwt
 import datetime
 
+#local imports
 from instance.config import app_config
-
 from app.models import meals, users, orders, Meal, menu, User, allusers
 
+
 list_users=[]
-
-
-
 NOT_FOUND = 'Not found'
 BAD_REQUEST = 'Bad request'
 
 
-
-
-
-
+"""App starts here.. In this case contains routes and functions used in the routes"""
 def create_app(config_name):
     from app.models import meals
     app = FlaskAPI(__name__, instance_relative_config=True)
@@ -33,6 +28,7 @@ def create_app(config_name):
     app.config['SECRET_KEY'] = "some-very-long-string-of-random-characters-CHANGE-TO-YOUR-LIKING"
 
 
+    #functions used in the routes below
     def _get_meal(id):
       return [meal for meal in meals if meal['id'] == id]
 
@@ -51,12 +47,12 @@ def create_app(config_name):
       return [order for order in orders if order[username] == username]
 
 
-
+    #Route returns list of all meals in database
     @app.route('/api/v1/meals', methods=['GET'])
     def get_meals():
         return jsonify({'meals': meals})
 
-
+    #Get just one meal using its id
     @app.route('/api/v1/meals/<int:id>', methods=['GET'])
     def get_meal(id):
         meal = _get_meal(id)
@@ -64,6 +60,7 @@ def create_app(config_name):
             abort(404)
         return jsonify({'meal': meal})
 
+    #Add meals to list of meals already available
     @app.route('/api/v1/meals', methods=['POST'])
     def create_meal():
         if not request.json or 'name' not in request.json or 'ingredients' not in request.json or 'price' not in request.json:
@@ -81,7 +78,7 @@ def create_app(config_name):
         meals.append(meal)
         return jsonify({'meal': meal}), 201
 
-
+    #Change values of an already existing meal
     @app.route('/api/v1/meals/<int:id>', methods=['PUT'])
     def update_meal(id):
         meal = _get_meal(id)
@@ -99,7 +96,7 @@ def create_app(config_name):
         meal[0]['price'] = price
         return jsonify({'meal': meal[0]}), 200
 
-
+    #Delete meal using id
     @app.route('/api/v1/meals/<int:id>', methods=['DELETE'])
     def delete_meal(id):
         meal = _get_meal(id)
@@ -108,17 +105,17 @@ def create_app(config_name):
         meals.remove(meal[0])
         return jsonify({}), 204
 
-
+    #Get orders from orders list
     @app.route('/api/v1/orders', methods=['GET'])
     def get_orders():
         return jsonify({'orders': orders})
 
-
-
+    #Get menu from menu list
     @app.route('/api/v1/menu', methods=['GET'])
     def get_menu():
         return jsonify({'menu': menu})
 
+    #Delete order using the username
     @app.route('/api/v1/orders/<username>', methods=['DELETE'])
     def delete_order(username):
         order = _get_order(username)
@@ -127,7 +124,7 @@ def create_app(config_name):
         orders.remove(order[0])
         return jsonify({}), 204
 
-    
+    #Endpoint to register user/ sign up
     @app.route('/auth/signup', methods=['POST'])
     def create_user():
         data = request.get_json()
@@ -138,25 +135,14 @@ def create_app(config_name):
 
         return jsonify({'message' : 'New user created!'})
 
-    @app.route('/user/<user_id>', methods=['PUT'])
-    def create_admin(user_id):
-        user = (item for item in newusers if item['user_id'] == 'user_id').next
-
-        if not user:
-            return jsonify({'message' : 'No user found!'})
-
-        user.caterer = True
-        caterers=[]
-        caterer.append(user)
-
-        return jsonify({'message' : 'The user has been promoted!'})
-
+    #function to enable login
     def get_by_email(email):
         
         for user in list_users:
             if user.email == email:
                 return user
 
+    #Endpoint for login
     @app.route('/auth/login')
     def login():
         user = {
@@ -164,15 +150,11 @@ def create_app(config_name):
                 'username': 'Ryan Tedder',
                 'email':'tedder@gmail.com',
                 'password': 'pass1234',
-        }
+                }
         if user.get('password') == 'pass1234':
             token = jwt.encode({'user' : user['username'], 'exp' : datetime.datetime.utcnow() + datetime.timedelta(seconds=15)}, app.config['SECRET_KEY'])
             return jsonify({'token' : token.decode('UTF-8')},{'message': 'You have successfully logged in'})
         return make_response('Could not verify!', 401)
-    
-
-
-
     
     return app
 

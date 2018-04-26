@@ -1,9 +1,11 @@
+#third party imports
 from copy import deepcopy
 import unittest
 import json
 
+#local imports
 from app import app
-from app.models import user1
+
 
 class AuthTestCase(unittest.TestCase):
     """Test case for the authentication of users"""
@@ -20,8 +22,8 @@ class AuthTestCase(unittest.TestCase):
         }
                 
 
-    def test_registration(self):
-        """Test user registration works correcty."""
+    def test_signup(self):
+        """Test that the user signup works correcty."""
         res = self.app.post('auth/signup', data=self.user_data)
         result = json.loads(res.data.decode())
         self.assertEqual(
@@ -29,22 +31,22 @@ class AuthTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 201)
 
     def test_already_registered_user(self):
-        """Test that a user cannot be registered twice."""
+        """Test that a user cannot sign up twice."""
         res = self.app.post('auth/signup', data=self.user_data)
         self.assertEqual(res.status_code, 201)
         second_res = self.client().post('auth/signup', data=self.user_data)
         self.assertEqual(second_res.status_code, 202)
         result = json.loads(second_res.data.decode())
         self.assertEqual(
-            result['message'], "User already exists. Please login.")
+            result['message'], "This user already exists! Kindly login")
 
     def test_user_login(self):
-        """Test registered user can login."""
+        """Test signed up user can login."""
         res = self.app.post('auth/login', data=self.user_data)
         self.assertEqual(res.status_code, 201)
         login_res = self.client().post('api/v1/auth/login', data=self.user_data)
         result = json.loads(login_res.data.decode())
-        self.assertEqual(result['message'], "You logged in successfully.")
+        self.assertEqual(result['message'], "Login successful!!")
         self.assertEqual(login_res.status_code, 200)
         
 
