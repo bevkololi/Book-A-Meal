@@ -72,7 +72,7 @@ class TestMeals(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(data['meal']['ingredients'], "Pork and spaghetti")
-        self.assertEqual(self.backup_meals[2]['ingredients'], "Unripe cooked banana, stew, mutton, appetizer")  # org value
+        self.assertEqual(self.backup_meals[2]['ingredients'], "Unripe cooked banana, stew, mutton, appetizer")  
 
     def test_update_error(self):
         """Test that user cannot modify a nonexisting meal"""

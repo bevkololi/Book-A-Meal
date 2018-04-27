@@ -32,6 +32,60 @@ class TestOrders(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['orders'][0]['username'], 'Angie Kihara')
 
+    def test_post(self):
+        """Test that user can add order"""
+        order = {"meal": "Some meal"}
+        response = self.app.post(BASE_URL,
+                                 data=json.dumps(order),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        #quantity field cannot take str#
+        order = {"meal": "A meal", "quantity": 'string'}
+        response = self.app.post(BASE_URL,
+                                 data=json.dumps(order),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        # valid: both required fields, quantity takes int
+        order = {"order_id": 5, "username": "Kim Chan", "meal": "A meal", "quantity": 8}
+        response = self.app.post(BASE_URL,
+                                 data=json.dumps(order),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(data['order']['order_id'], 4)
+        self.assertEqual(data['order']['meal'], 'A meal')
+        # cannot add order with same order again
+        order = {"meal": "A meal", "quantity": 8}
+        response = self.app.post(BASE_URL,
+                                 data=json.dumps(order),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_update(self):
+        """Test that user can modify existing order"""
+        order = {"meal": "Pork and spaghetti"}
+        response = self.app.put(GOOD_ITEM_URL,
+                                data=json.dumps(order),
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(data['order']['meal'], "Pork and spaghetti")
+        self.assertEqual(self.backup_orders[2]['meal'], "Unripe cooked banana, stew, mutton, appetizer")  
+
+    def test_update_error(self):
+        """Test that user cannot modify a nonexisting order"""
+        order = {"quantity": "10"}
+        response = self.app.put(BAD_ITEM_URL,
+                                data=json.dumps(order),
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 404)
+        # quantity field cannot take str
+        order = {"quantity": 'string'}
+        response = self.app.put(GOOD_ITEM_URL,
+                                data=json.dumps(order),
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
     
     def test_delete(self):
         """Test that user can get delete orders"""

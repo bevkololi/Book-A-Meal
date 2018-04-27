@@ -52,8 +52,13 @@ def _get_user(id):
 def _user_exists(email):
   return [user for user in users if user["email"] == email]
 
-def _get_order(username):
-  return [order for order in orders if order[username] == username]
+def _get_order(order_id):
+  return [order for order in orders if order["order_id"] == order_id]
+
+def _order_exists(username):
+	return [order for order in orders if order["username"] == username]
+
+
 
 
 #Route returns list of all meals in database
@@ -119,11 +124,55 @@ def delete_meal(id):
 def get_orders():
     return jsonify({'orders': orders})
 
-#Delete order using the username
-@app.route('/api/v1/orders/<username>', methods=['DELETE'])
-def delete_order(username):
-    order = _get_order(username)
-    if len(username) == 0:
+#Get just one order using order_id
+@app.route('/api/v1/orders/<int:order_id>', methods=['GET'])
+def get_order(order_id):
+    order = _get_order(order_id)
+    if not order:
+        abort(404)
+    return jsonify({'order': order})
+
+#Add order to list of orders already available
+@app.route('/api/v1/orders', methods=['POST'])
+def create_order():
+    if not request.json or 'username' not in request.json or 'meal' not in request.json or 'quantity' not in request.json:
+        abort(400)
+    order_id = orders[-1].get("order_id") + 1
+    username = request.json.get('username')
+    meal = request.json.get('meal')
+    if _order_exists(username):
+        abort(400)
+    quantity = request.json.get('quantity')
+    if type(quantity) is not int:
+        abort(400)
+    order = {"order_id": order_id, "username": username,
+            "meal": meal,"quantity": quantity}
+    orders.append(order)
+    return jsonify({'order': order}), 201
+
+#Change values of an already existing order
+@app.route('/api/v1/orders/<int:order_id>', methods=['PUT'])
+def update_order(order_id):
+    order = _get_order(order_id)
+    if len(order) == 0:
+        abort(404)
+    if not request.json:
+        abort(400)
+    username = request.json.get('username', order[0]['username'])
+    meal = request.json.get('meal', order[0]['meal'])
+    quantity = request.json.get('quantity', order[0]['quantity'])
+    if type(quantity) is not int:
+        abort(400)
+    order[0]['username'] = username
+    order[0]['meal'] = meal
+    order[0]['quantity'] = quantity
+    return jsonify({'order': order[0]}), 200
+
+#Delete order using order_id
+@app.route('/api/v1/orders/<int:order_id>', methods=['DELETE'])
+def delete_order(order_id):
+    order = _get_order(order_id)
+    if len(order) == 0:
         abort(404)
     orders.remove(order[0])
     return jsonify({}), 204

@@ -114,14 +114,15 @@ menu = (json.loads(mealinmenustr))
 
 #Same as class order
 class Order(BaseModel):
-    def __init__(self, username, meal, quantity):
+    def __init__(self, order_id, username, meal, quantity):
+        self.order_id = order_id
         self.username = username
         self.meal = meal
         self.quantity = quantity
 
-order1 = Order("Angie Kihara", "Pilau and chicken", 2)
-order2 = Order("Victor Kubo", "Ugali, fish, vegetables, spices", 1)
-order3 = Order("Charles Ngara","Unripe cooked banana, stew, mutton, appetizer", 4)
+order1 = Order(1, "Angie Kihara", "Pilau and chicken", 2)
+order2 = Order(2, "Victor Kubo", "Ugali, fish, vegetables, spices", 1)
+order3 = Order(3, "Charles Ngara","Unripe cooked banana, stew, mutton, appetizer", 4)
 
 def jdefault(o):
     return o.__dict__
@@ -132,7 +133,28 @@ allorders.append(order2)
 allorders.append(order3)
 
 orderstr = (json.dumps(allorders, default=jdefault,  indent=4, sort_keys=True))
-orders = (json.loads(orderstr))
+neworders = (json.loads(orderstr))
+
+orders = [
+    {
+        "order_id": 1,
+        "username": "Angie Kihara",
+        'meal': 'Pilau and chicken',
+        'quantity': 2,
+    },
+    {   
+        "order_id": 2,
+        'username': 'Victor Kubo',
+        'meal': 'Ugali, fish, vegetables and spices',
+        'quantity': 1,
+    },
+    {   
+        "order_id": 3,
+        'username': 'Charles Ngara',
+        'measl': 'Unripe cooked banana, stew, mutton, appetizer',
+        'quantity': 4,
+    },
+]
 
 
 
