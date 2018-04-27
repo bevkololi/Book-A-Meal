@@ -151,7 +151,7 @@ orders = [
     {   
         "order_id": 3,
         'username': 'Charles Ngara',
-        'measl': 'Unripe cooked banana, stew, mutton, appetizer',
+        'meal': 'Unripe cooked banana, stew, mutton, appetizer',
         'quantity': 4,
     },
 ]

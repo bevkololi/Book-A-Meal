@@ -2,6 +2,7 @@
 from copy import deepcopy
 import unittest
 import json
+import jwt
 
 #local imports
 from app import app
