@@ -5,12 +5,13 @@ from flask import Flask, jsonify, abort, make_response, request
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 from functools import wraps
-
+import jwt
+import datetime
 #local imports
 from app import create_app
-from app.models import meals, users, orders, Meal, menu
+from app.models import meals, users, orders, Meal, menu, User
 
-
+list_users =[]
 meals = [
     {
         'id': 1,
@@ -182,30 +183,33 @@ def delete_order(order_id):
 def get_menu():
     return jsonify({'menu': menu})
 
+
 #Endpoint to register user/ sign up
 @app.route('/auth/signup', methods=['POST'])
 def create_user():
-    data = request.get_json()
+    data = request.get_json(force=True)
+    caterer = data.get('caterer', False)
 
     hashed_password = generate_password_hash(data['password'], method='sha256')
-    new_user = User(user_id=4, username=data['username'], email=data['email'], password=hashed_password, caterer=False)
+    new_user = User(user_id=4, username=data['username'], email=data['email'], password=hashed_password, caterer=caterer)
+
     list_users.append(new_user)
 
-    return jsonify({'message' : 'New user created!'})
+    return jsonify({'message' : 'New user created!'}), 201
 
 #function to enable login
-@app.route('/user/<user_id>', methods=['PUT'])
-def create_admin(user_id):
-    user = (item for item in newusers if item['user_id'] == 'user_id').next
+# @app.route('/user/<user_id>', methods=['PUT'])
+# def create_admin(user_id):
+#     user = (item for item in newusers if item['user_id'] == 'user_id').next
 
-    if not user:
-        return jsonify({'message' : 'No user found!'})
+#     if not user:
+#         return jsonify({'message' : 'No user found!'})
 
-    user.caterer = True
-    caterers=[]
-    caterer.append(user)
+#     user.caterer = True
+#     caterers=[]
+#     caterer.append(user)
 
-    return jsonify({'message' : 'The user has been promoted!'})
+#     return jsonify({'message' : 'The user has been promoted!'})
 
 def get_by_email(email):
     
@@ -214,18 +218,17 @@ def get_by_email(email):
             return user
 
 #Endpoint for login
-@app.route('/auth/login', methods=['GET'])
+@app.route('/auth/login', methods=['POST'])
 def login():
-    user = {
-            'user_id':3,
-            'username': 'Ryan Tedder',
-            'email':'tedder@gmail.com',
-            'password': 'pass1234',
-    }
-    if user.get('password') == 'pass1234':
-        token = jwt.encode({'user' : user['username'], 'exp' : datetime.datetime.utcnow() + datetime.timedelta(seconds=15)}, app.config['SECRET_KEY'])
-        return jsonify({'token' : token.decode('UTF-8')},{'message': 'You have successfully logged in'})
-    return make_response('Could not verify!', 401)
+    data = request.get_json(force=True)
+    email = data['email']
+    password = data['password']
+
+    user = get_by_email(email)
+    if user and check_password_hash(user.password, password):
+        token = jwt.encode({'user' : user.username, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(seconds=15)}, str(app.config['SECRET_KEY']))
+        return jsonify({'token' : token.decode('UTF-8'), 'message': 'Login successful!!'}), 200
+    return make_response(jsonify({'message':'Invalid email or password, Please try again.'}), 401)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -19,34 +19,26 @@ class AuthTestCase(unittest.TestCase):
         self.user_data = {
             'username': 'Bev Kololi',
             'email': 'bev@gmail.com',
-            'password': 'pass1234'
+            'password': 'pass1234',
+            'caterer': True
         }
                 
 
     def test_signup(self):
         """Test that the user signup works correcty."""
-        res = self.app.post('auth/signup', data=self.user_data)
-        result = json.loads(res.data.decode())
+        res = self.app.post('auth/signup', data=json.dumps(self.user_data))
+        result = json.loads(res.data.decode('utf-8'))
         self.assertEqual(
-            result['message'], "Sign up successful. Please login.")
+            result['message'], 'New user created!')
         self.assertEqual(res.status_code, 201)
 
-    def test_already_registered_user(self):
-        """Test that a user cannot sign up twice."""
-        res = self.app.post('auth/signup', data=self.user_data)
-        self.assertEqual(res.status_code, 201)
-        second_res = self.client().post('auth/signup', data=self.user_data)
-        self.assertEqual(second_res.status_code, 202)
-        result = json.loads(second_res.data.decode())
-        self.assertEqual(
-            result['message'], "This user already exists! Kindly login")
-
+   
     def test_user_login(self):
         """Test signed up user can login."""
-        res = self.app.get('auth/login', data=self.user_data)
+        res = self.app.post('auth/signup', data=json.dumps(self.user_data))
         self.assertEqual(res.status_code, 201)
-        login_res = self.client().post('api/v1/auth/login', data=self.user_data)
-        result = json.loads(login_res.data.decode())
+        login_res = self.app.post('/auth/login', data=json.dumps(self.user_data))
+        result = json.loads(login_res.data.decode('utf-8'))
         self.assertEqual(result['message'], "Login successful!!")
         self.assertEqual(login_res.status_code, 200)
         
@@ -57,10 +49,10 @@ class AuthTestCase(unittest.TestCase):
             'email': 'emily20@gmail.com',
             'password': 'pass9876'
         }
-        res = self.app.post('auth/login', data=not_a_user)
-        
-        result = json.loads(res.data.decode())
+        res = self.app.post('auth/login', data=json.dumps(not_a_user))
         self.assertEqual(res.status_code, 401)
+        result = json.loads(res.data.decode('utf-8'))
+        
         self.assertEqual(
             result['message'], "Invalid email or password, Please try again.")
 
