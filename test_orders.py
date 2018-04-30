@@ -1,9 +1,9 @@
-#third party imports
+# third party imports
 from copy import deepcopy
 import unittest
 import json
 
-#local imports
+# local imports
 from app import app
 
 BASE_URL = 'http://127.0.0.1:5000/api/v1/orders'
@@ -13,12 +13,22 @@ GOOD_ITEM_URL = '{}/3'.format(BASE_URL)
 
 class TestOrders(unittest.TestCase):
     """Set up test variables"""
-    def setUp(self):
-        orders = [{"order_id": 1, "username": "Angie Kihara", 'meal': 'Pilau and chicken', 'quantity': 2},
-                {"order_id": 2, 'username': 'Victor Kubo', 'meal': 'Ugali, fish, vegetables and spices', 'quantity': 1},
-                {"order_id": 3, 'username': 'Charles Ngara', 'meal': 'Unripe cooked banana, stew, mutton, appetizer', 'quantity': 4}]
 
-        self.backup_orders = deepcopy(orders)  
+    def setUp(self):
+        orders = [{"order_id": 1,
+                   "username": "Angie Kihara",
+                   'meal': 'Pilau and chicken',
+                   'quantity': 2},
+                  {"order_id": 2,
+                   'username': 'Victor Kubo',
+                   'meal': 'Ugali, fish, vegetables and spices',
+                   'quantity': 1},
+                  {"order_id": 3,
+                   'username': 'Charles Ngara',
+                   'meal': 'Unripe cooked banana, stew, mutton, appetizer',
+                   'quantity': 4}]
+
+        self.backup_orders = deepcopy(orders)
         self.app = app.app.test_client()
         self.app.testing = True
 
@@ -50,7 +60,11 @@ class TestOrders(unittest.TestCase):
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
         # valid: both required fields, quantity takes int
-        order = {"order_id": 5, "username": "Kim Chan", "meal": "A meal", "quantity": 8}
+        order = {
+            "order_id": 5,
+            "username": "Kim Chan",
+            "meal": "A meal",
+            "quantity": 8}
         response = self.app.post(BASE_URL,
                                  data=json.dumps(order),
                                  content_type='application/json')
@@ -74,7 +88,9 @@ class TestOrders(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(data['order']['meal'], "Pork and spaghetti")
-        self.assertEqual(self.backup_orders[2]['meal'], "Unripe cooked banana, stew, mutton, appetizer")  
+        self.assertEqual(
+            self.backup_orders[2]['meal'],
+            "Unripe cooked banana, stew, mutton, appetizer")
 
     def test_update_error(self):
         """Test that user cannot modify a nonexisting order"""
@@ -90,12 +106,10 @@ class TestOrders(unittest.TestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
-    
     def test_delete(self):
         """Test that user can get delete orders"""
         response = self.app.delete(GOOD_ITEM_URL)
         self.assertEqual(response.status_code, 200)
-        
 
     def tearDown(self):
         """reset app.orders to initial state"""
