@@ -33,50 +33,130 @@ Find it on https://bevkololi.github.io or clone the files from https://github.co
 
 
 
-# Reference
+## User Signup [/auth/signup]
 
-Meal
-## View all meals [api/v1/meals]
-
-### Get meals [GET]
-
-Caterer could use this to view meals and users too
-
-+ Response 200 (application/json)
-
-        {
-            "meals": [
-                {
-                    "id": 1,
-                    "ingredients": "Ugali, fish, vegetables, spices",
-                    "name": "Ugali and fish",
-                    "price": 150
-                },
-                    "ingredients": "Cooked rice, salad, stewed beef",
-                    "name": "Rice and beef",
-                {
-                    "id": 2,
-                    "price": 320
-                },
-                {
-                    "id": 3,
-                    "ingredients": "Unripe cooked banana, stew, mutton, appetizer",
-                    "name": "Matoke and mutton",
-                    "price": 250
-                }
-            ]
-        }
-
-## Update meals [api/v1/meals/<int:id>]
-### Create a New meal [POST]
-
-Caterer could create meals that would be stored in the meals list
+### User sign up [POST]
 
 + Request (application/json)
 
+
         {
-            "id": 4,
-            "ingredients": "Managu ang githeri mixed with mashed potatoes",
-            "name": "Food added",
-            "price": 300
+            "username": "Bev Kololi",
+            "email": "bev@gmail.com",
+            "password": "pass1234"
+        } 
+
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /auth/signup
+
+    + Body
+
+            {
+            "message": "New user created!"
+            }
+            
+## User Login [/auth/login]
+
+### User sign up [POST]
+
++ Request (application/json)
+
+
+        {
+            "username": "Bev Kololi",
+            "email": "bev@gmail.com",
+            "password": "pass1234"
+        } 
+
+
++ Response 200 (application/json)
+
+    + Headers
+
+            Location: /auth/signup
+
+    + Body
+
+            {
+            "message": "Login successful!!"
+            }
+
+## Meals [/api/v1/meals]
+
+### Add meals [POST]
+
++ Request (application/json)
+
+
+        {
+                "id": 2,
+                "name": "Rice and beef",
+                "ingredients": "Cooked rice, salad, stewed beef",
+                "price": 320,
+        } 
+
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /api/v1/meals
+
+    + Body
+
+            {
+            "meal": meal
+            }
+
+### Get meals [GET]
+
++ Response 201 (application/json)
+
+
+        {
+                "id": 2,
+                "name": "Rice and beef",
+                "ingredients": "Cooked rice, salad, stewed beef",
+                 "price": 320,
+        }
+        
+## Orders [/api/v1/orders]
+
+### Add orders [POST]
+
++ Request (application/json)
+
+
+        {       "order_id": 1, 
+                "username": "Angie Kihara", 
+                "meal": "Pilau and chicken", 
+                "quantity": 2
+        } 
+
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /api/v1/orders
+
+    + Body
+
+            {
+            "order": order
+            }
+
+### Get order [GET]
+
++ Response 201 (application/json)
+
+
+        {       "order_id": 1, 
+                "username": "Angie Kihara", 
+                "meal": "Pilau and chicken", 
+                "quantity": 2
         }
