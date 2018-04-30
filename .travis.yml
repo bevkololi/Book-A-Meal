@@ -14,5 +14,6 @@ script:
 
 after_success:
     - coverage run --source='.' test_meals.py
+    - coveralls
 
 cache: pip
