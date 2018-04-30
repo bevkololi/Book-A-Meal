@@ -21,7 +21,6 @@ app = Flask(__name__)
 NOT_FOUND = 'Not found'
 BAD_REQUEST = 'Bad request'
 
-#functions used in the routes below
 def _get_meal(id):
       return [meal for meal in meals if meal['id'] == id]
 
@@ -45,22 +44,25 @@ def _order_exists(username):
 
 
 
-#Route returns list of all meals in database
+
 @app.route('/api/v1/meals', methods=['GET'])
 def get_meals():
+    """Route returns list of all meals in database"""
     return jsonify({'meals': meals})
 
-#Get just one meal using its id
+
 @app.route('/api/v1/meals/<int:id>', methods=['GET'])
 def get_meal(id):
+    """Get just one meal using its id"""
     meal = _get_meal(id)
     if not meal:
         abort(404)
     return jsonify({'meal': meal})
 
-#Add meals to list of meals already available
+
 @app.route('/api/v1/meals', methods=['POST'])
 def create_meal():
+    """Add meals to list of meals already available"""
     if not request.json or 'name' not in request.json or 'ingredients' not in request.json or 'price' not in request.json:
         abort(400)
     meal_id = request.json.get('id')
@@ -76,9 +78,10 @@ def create_meal():
     meals.append(meal)
     return jsonify({'meal': meal}), 201
 
-#Change values of an already existing meal
+
 @app.route('/api/v1/meals/<int:id>', methods=['PUT'])
 def update_meal(id):
+    """Change values of an already existing meal"""
     meal = _get_meal(id)
     if len(meal) == 0:
         abort(404)
@@ -94,9 +97,10 @@ def update_meal(id):
     meal[0]['price'] = price
     return jsonify({'meal': meal[0]}), 200
 
-#Delete meal using id
+
 @app.route('/api/v1/meals/<int:id>', methods=['DELETE'])
 def delete_meal(id):
+    """Delete meal using id"""
     meal = _get_meal(id)
     if meal:
         del meal
@@ -105,22 +109,24 @@ def delete_meal(id):
 
 
     
-#Get orders from orders list
 @app.route('/api/v1/orders', methods=['GET'])
 def get_orders():
+    """Get orders from orders list"""
     return jsonify({'orders': orders})
 
-#Get just one order using order_id
+
 @app.route('/api/v1/orders/<int:order_id>', methods=['GET'])
 def get_order(order_id):
+    """Get just one order using order_id"""
     order = _get_order(order_id)
     if not order:
         abort(404)
     return jsonify({'order': order})
 
-#Add order to list of orders already available
+
 @app.route('/api/v1/orders', methods=['POST'])
 def create_order():
+    """Add order to list of orders already available"""
     if not request.json or 'username' not in request.json or 'meal' not in request.json or 'quantity' not in request.json:
         abort(400)
     order_id = orders[-1].get("order_id") + 1
@@ -136,9 +142,10 @@ def create_order():
     orders.append(order)
     return jsonify({'order': order}), 201
 
-#Change values of an already existing order
+
 @app.route('/api/v1/orders/<int:order_id>', methods=['PUT'])
 def update_order(order_id):
+    """Change values of an already existing order"""
     order = _get_order(order_id)
     if len(order) == 0:
         abort(404)
@@ -154,9 +161,10 @@ def update_order(order_id):
     order[0]['quantity'] = quantity
     return jsonify({'order': order[0]}), 200
 
-#Delete order using order_id
+
 @app.route('/api/v1/orders/<int:order_id>', methods=['DELETE'])
 def delete_order(order_id):
+    """Delete order using order_id"""
     order = _get_order(order_id)
     if order:
         del order
@@ -184,7 +192,6 @@ def get_menu():
     return jsonify({'menu': todays_menu}), 201
 
 
-#Endpoint to register user/ sign up
 @app.route('/auth/signup', methods=['POST'])
 def create_user():
     data = request.get_json(force=True)
@@ -197,19 +204,7 @@ def create_user():
 
     return jsonify({'message' : 'New user created!'}), 201
 
-#function to enable login
-# @app.route('/user/<user_id>', methods=['PUT'])
-# def create_admin(user_id):
-#     user = (item for item in newusers if item['user_id'] == 'user_id').next
 
-#     if not user:
-#         return jsonify({'message' : 'No user found!'})
-
-#     user.caterer = True
-#     caterers=[]
-#     caterer.append(user)
-
-#     return jsonify({'message' : 'The user has been promoted!'})
 
 def get_by_email(email):
     
@@ -217,7 +212,7 @@ def get_by_email(email):
         if user.email == email:
             return user
 
-#Endpoint for login
+
 @app.route('/auth/login', methods=['POST'])
 def login():
     data = request.get_json(force=True)
