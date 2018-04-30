@@ -13,6 +13,6 @@ script:
     - py.test
 
 after_success:
-    - coveralls
+    - coverage run --source='.' test_meals.py
 
 cache: pip
