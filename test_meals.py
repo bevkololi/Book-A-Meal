@@ -1,40 +1,45 @@
+#third party importd
 from copy import deepcopy
 import unittest
 import json
 
+#local imports
 from app import app
-from app.models import meals1
+# from app.models import meals
 
-
-
-
-
+#defining URLs to avoid repitition
 BASE_URL = 'http://127.0.0.1:5000/api/v1/meals'
-BAD_ITEM_URL = '{}/5'.format(BASE_URL)
+BAD_ITEM_URL = '{}/5'.format(BASE_URL) #redirects url in case of bad requests so app doesn't crash
 GOOD_ITEM_URL = '{}/3'.format(BASE_URL)
 
 
 class TestMeals(unittest.TestCase):
-
     def setUp(self):
-        self.backup_meals = deepcopy(app.meals)  
+        """Set up test variables"""
+        meals = [{'id': 1, 'name': 'Ugali and fish', 'ingredients': 'Ugali, fish, vegetables, spices', 'price': 150},
+                {'id': 2, 'name': 'Rice and beef', 'ingredients': 'Cooked rice, salad, stewed beef', 'price': 320},
+                {'id': 3, 'name': 'Matoke and mutton', 'ingredients': 'Unripe cooked banana, stew, mutton, appetizer', 'price': 250}]
+        self.backup_meals = deepcopy(meals)  
         self.app = app.app.test_client()
         self.app.testing = True
 
     def test_get_all(self):
+        """Test that user can get all meals"""
+        meals={'id': 1, 'name': 'Ugali and fish', 'ingredients': 'Ugali, fish, vegetables, spices', 'price': 150}
         response = self.app.get(BASE_URL)
-        data = meals1 # This  has been described as : Meal(1, "Ugali and fish", "Ugali, fish, vegetables, spices", 150)#
+        data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data['meals']), 3)
-
+                
     def test_get_one(self):
+        """Test that user can get just one meal"""
+        meals={'id': 1, 'name': 'Ugali and fish', 'ingredients': 'Ugali, fish, vegetables, spices', 'price': 150}
         response = self.app.get(BASE_URL)
-        data = meals1
+        data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['meals'][0]['name'], 'Ugali and fish')
 
-    
     def test_post(self):
+        """Test that user can add meal"""
         meal = {"name": "Some meal"}
         response = self.app.post(BASE_URL,
                                  data=json.dumps(meal),
@@ -53,7 +58,7 @@ class TestMeals(unittest.TestCase):
                                  content_type='application/json')
         self.assertEqual(response.status_code, 201)
         data = json.loads(response.get_data().decode('utf-8'))
-        self.assertEqual(data['meal']['id'], 4)
+        self.assertEqual(data['meal']['id'], 5)
         self.assertEqual(data['meal']['name'], 'A meal')
         # cannot add meal with same name again
         meal = {"name": "A meal", "price": 70}
@@ -63,6 +68,7 @@ class TestMeals(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_update(self):
+        """Test that user can modify existing meal"""
         meal = {"ingredients": "Pork and spaghetti"}
         response = self.app.put(GOOD_ITEM_URL,
                                 data=json.dumps(meal),
@@ -70,10 +76,10 @@ class TestMeals(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(data['meal']['ingredients'], "Pork and spaghetti")
-        self.assertEqual(self.backup_meals[2]['ingredients'], "Unripe cooked banana, stew, mutton, appetizer")  # org value
+        self.assertEqual(self.backup_meals[0]['ingredients'], 'Ugali, fish, vegetables, spices')  
 
     def test_update_error(self):
-        # cannot edit non-existing meal
+        """Test that user cannot modify a nonexisting meal"""
         meal = {"price": "900"}
         response = self.app.put(BAD_ITEM_URL,
                                 data=json.dumps(meal),
@@ -87,13 +93,13 @@ class TestMeals(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_delete(self):
+        """Test that user can delete meal"""
         response = self.app.delete(GOOD_ITEM_URL)
-        self.assertEqual(response.status_code, 204)
-        response = self.app.delete(BAD_ITEM_URL)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        
 
     def tearDown(self):
-        # reset app.meals to initial state
+        """reset app.meals to initial state"""
         app.meals = self.backup_meals
 
 
