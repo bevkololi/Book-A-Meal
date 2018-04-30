@@ -10,17 +10,19 @@ import datetime
 
 #local imports
 from instance.config import app_config
-from app.models import meals, users, orders, Meal, menu, User, allusers
+from app.models import Meal, User
 
 
 list_users=[]
+meals=[]
+orders=[]
+
 NOT_FOUND = 'Not found'
 BAD_REQUEST = 'Bad request'
 
 
 """App starts here.. In this case contains routes and functions used in the routes"""
 def create_app(config_name):
-    from app.models import meals
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
     app.config.from_pyfile('config.py')
@@ -65,7 +67,7 @@ def create_app(config_name):
     def create_meal():
         if not request.json or 'name' not in request.json or 'ingredients' not in request.json or 'price' not in request.json:
             abort(400)
-        meal_id = meals[-1].get("id") + 1
+        meal_id = request.json.get('id')
         name = request.json.get('name')
         ingredients = request.json.get('ingredients')
         if _meal_exists(name):
@@ -100,10 +102,10 @@ def create_app(config_name):
     @app.route('/api/v1/meals/<int:id>', methods=['DELETE'])
     def delete_meal(id):
         meal = _get_meal(id)
-        if len(meal) == 0:
-            abort(404)
-        meals.remove(meal[0])
-        return jsonify({}), 204
+        if meal:
+            del meal
+        else:
+            return jsonify({'message': 'Meal does not exist'})
 
     #Get orders from orders list
     @app.route('/api/v1/orders', methods=['GET'])
@@ -117,20 +119,21 @@ def create_app(config_name):
 
     #Delete order using the username
     @app.route('/api/v1/orders/<username>', methods=['DELETE'])
-    def delete_order(username):
-        order = _get_order(username)
-        if len(username) == 0:
-            abort(404)
-        orders.remove(order[0])
-        return jsonify({}), 204
+    def delete_order(order_id):
+        order = _get_order(order_id)
+        if order:
+            del order
+        else:
+            return jsonify ({'message': 'Order does not exist'})
 
     #Endpoint to register user/ sign up
     @app.route('/auth/signup', methods=['POST'])
     def create_user():
         data = request.get_json(force=True)
+        caterer = data['caterer'] or False
 
         hashed_password = generate_password_hash(data['password'], method='sha256')
-        new_user = User(user_id=4, username=data['username'], email=data['email'], password=hashed_password, caterer=False)
+        new_user = User(user_id=4, username=data['username'], email=data['email'], password=hashed_password, caterer=caterer)
 
         list_users.append(new_user)
 
@@ -162,7 +165,7 @@ def create_app(config_name):
         data = request.get_json(force=True)
         email = data['email']
         password = data['password']
-        caterer = data['caterer']
+
 
         user = get_by_email(email)
         if user and check_password_hash(user.password, password):

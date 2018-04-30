@@ -13,7 +13,6 @@ class AuthTestCase(unittest.TestCase):
 
     def setUp(self):
         """Set up test variables."""
-        self.backup_users = deepcopy(app.users)
         self.app = app.app.test_client()
         self.app.testing = True
         self.user_data = {

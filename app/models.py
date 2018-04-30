@@ -20,51 +20,6 @@ class Meal(BaseModel):
         self.ingredients = ingredients
         self.price = price
 
-#created 3 different meals
-meals1 = Meal(1, "Ugali and fish", "Ugali, fish, vegetables, spices", 150)
-meals2 = Meal(2, "Rice and beef", "Ugali, fish, vegetables, spices", 150)
-meals3 = Meal(3, "Matoke and mutton", "Unripe cooked banana, stew, mutton, appetizer", 250)
-
-#jsonify the output
-def jdefault(o):
-    return o.__dict__
-
-#out all created meals in one list
-allmeals = []
-allmeals.append(meals1)
-allmeals.append(meals2)
-allmeals.append(meals3)
-
-#creates meal in form of string
-mealstr = (json.dumps(allmeals, default=jdefault, 
-                     indent=4, sort_keys=True))
-#creates unordered dictionary of meals
-mealsunord = (json.loads(mealstr))
-
-"""
-Due to the fact that dicts are unordered, it will be hard for some of the endpoints to work
-I therefore created my own meals dict. These are unavoidable circumstances at the moment
-"""
-meals = [
-    {
-        'id': 1,
-        'name': 'Ugali and fish',
-        'ingredients': 'Ugali, fish, vegetables, spices',
-        'price': 150,
-    },
-    {
-        'id': 2,
-        'name': 'Rice and beef',
-        'ingredients': 'Cooked rice, salad, stewed beef',
-        'price': 320,
-    },
-    {
-        'id': 3,
-        'name': 'Matoke and mutton',
-        'ingredients': 'Unripe cooked banana, stew, mutton, appetizer',
-        'price': 250,
-    },
-]
 
 
 class User(BaseModel):
@@ -76,17 +31,17 @@ class User(BaseModel):
         self.password = password
         self.caterer = caterer
 
-allusers=[]
-user1 = User(1, "Mike Sonko", "sonko@gmail.com", "pass1234")
-user2 = User(2, "Jim Mugabe", "mugabe@gmail.com", "pass2222")
-user3 = User(3, "Ian Njagi", "njagi@gmail.com", "pass8888")
+# allusers=[]
+# user1 = User(1, "Mike Sonko", "sonko@gmail.com", "pass1234")
+# user2 = User(2, "Jim Mugabe", "mugabe@gmail.com", "pass2222")
+# user3 = User(3, "Ian Njagi", "njagi@gmail.com", "pass8888")
 
-allusers.append(user1)
-allusers.append(user2)
-allusers.append(user3)
+# allusers.append(user1)
+# allusers.append(user2)
+# allusers.append(user3)
 
-userstr = (json.dumps(allusers, default=jdefault))
-users = (json.loads(userstr))
+# userstr = (json.dumps(allusers, default=jdefault))
+# users = (json.loads(userstr))
 
 
 #Sameas class caterer
@@ -96,20 +51,14 @@ class Caterer(User):
         self.caterer = caterer
 caterer1 = Caterer ("Mike Sonko", "sonko@gmail.com", "pass1234", "Caterer")
 
-
+TODAY = datetime.utcnow().date()
 #Same as class menu
-class Menu(BaseModel):
-    today = datetime.utcnow().date()
+# class Menu(BaseModel):
+#     def __init__(self, meals, date=TODAY):
+#         self.meals = meals
+#         self.date = str(date)
 
-themenu=[]
-def add_to_menu(themenu, meal):
-    themenu.append(meal)
-    return themenu
 
-meal_in_menu = add_to_menu(themenu, meals1)
-meal_in_menu = add_to_menu(themenu, meals3)
-mealinmenustr = (json.dumps(meal_in_menu, default=jdefault,  indent=4, sort_keys=True))
-menu = (json.loads(mealinmenustr))
     
 
 #Same as class order
@@ -135,26 +84,26 @@ allorders.append(order3)
 orderstr = (json.dumps(allorders, default=jdefault,  indent=4, sort_keys=True))
 neworders = (json.loads(orderstr))
 
-orders = [
-    {
-        "order_id": 1,
-        "username": "Angie Kihara",
-        'meal': 'Pilau and chicken',
-        'quantity': 2,
-    },
-    {   
-        "order_id": 2,
-        'username': 'Victor Kubo',
-        'meal': 'Ugali, fish, vegetables and spices',
-        'quantity': 1,
-    },
-    {   
-        "order_id": 3,
-        'username': 'Charles Ngara',
-        'meal': 'Unripe cooked banana, stew, mutton, appetizer',
-        'quantity': 4,
-    },
-]
+# orders = [
+#     {
+#         "order_id": 1,
+#         "username": "Angie Kihara",
+#         'meal': 'Pilau and chicken',
+#         'quantity': 2,
+#     },
+#     {   
+#         "order_id": 2,
+#         'username': 'Victor Kubo',
+#         'meal': 'Ugali, fish, vegetables and spices',
+#         'quantity': 1,
+#     },
+#     {   
+#         "order_id": 3,
+#         'username': 'Charles Ngara',
+#         'meal': 'Unripe cooked banana, stew, mutton, appetizer',
+#         'quantity': 4,
+#     },
+# ]
 
 
 

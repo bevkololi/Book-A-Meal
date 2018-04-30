@@ -9,29 +9,12 @@ import jwt
 import datetime
 #local imports
 from app import create_app
-from app.models import meals, users, orders, Meal, menu, User
+from app.models import Meal, User
 
 list_users =[]
-meals = [
-    {
-        'id': 1,
-        'name': 'Ugali and fish',
-        'ingredients': 'Ugali, fish, vegetables, spices',
-        'Price': 150,
-    },
-    {
-        'id': 2,
-        'name': 'Rice and beef',
-        'ingredients': 'Cooked rice, salad, stewed beef',
-        'price': 320,
-    },
-    {
-        'id': 3,
-        'name': 'Matoke and mutton',
-        'ingredients': 'Unripe cooked banana, stew, mutton, appetizer',
-        'price': 250,
-    },
-]
+todays_menu = {}
+meals = []
+orders = []
 
 app = Flask(__name__)
 
@@ -47,11 +30,11 @@ def _meal_exists(name):
   return [meal for meal in meals if meal["name"] == name]
 
 def _get_user(id):
-  return [user for user in users if user['id'] == id]
+  return [user for user in list_users if user['id'] == id]
 
 
 def _user_exists(email):
-  return [user for user in users if user["email"] == email]
+  return [user for user in list_users if user["email"] == email]
 
 def _get_order(order_id):
   return [order for order in orders if order["order_id"] == order_id]
@@ -80,7 +63,7 @@ def get_meal(id):
 def create_meal():
     if not request.json or 'name' not in request.json or 'ingredients' not in request.json or 'price' not in request.json:
         abort(400)
-    meal_id = meals[-1].get("id") + 1
+    meal_id = request.json.get('id')
     name = request.json.get('name')
     ingredients = request.json.get('ingredients')
     if _meal_exists(name):
@@ -115,11 +98,13 @@ def update_meal(id):
 @app.route('/api/v1/meals/<int:id>', methods=['DELETE'])
 def delete_meal(id):
     meal = _get_meal(id)
-    if len(meal) == 0:
-        abort(404)
-    meals.remove(meal[0])
-    return jsonify({}), 204
+    if meal:
+        del meal
+    else:
+        return jsonify ({'message': 'Meal does not exist'})
 
+
+    
 #Get orders from orders list
 @app.route('/api/v1/orders', methods=['GET'])
 def get_orders():
@@ -173,15 +158,30 @@ def update_order(order_id):
 @app.route('/api/v1/orders/<int:order_id>', methods=['DELETE'])
 def delete_order(order_id):
     order = _get_order(order_id)
-    if len(order) == 0:
-        abort(404)
-    orders.remove(order[0])
-    return jsonify({}), 204
+    if order:
+        del order
+    else:
+        return jsonify ({'message': 'Order does not exist'})
 
-#Get menu from menu list
+# #Get menu from menu list
+# @app.route('/api/v1/menu', methods=['GET'])
+# def get_menu():
+#     return jsonify({'menu': menu})
+
+@app.route('/api/v1/menu', methods=['POST'])
+def create_menu():
+    post_data = request.get_json(force=True)
+    date = post_data.get('date', '')
+    meals = post_data.get('meals')
+    menu = Menu(date=date, meals=meals)
+    menu = menu.create_dict()
+    todays_menu.update({str(date): menu})
+
+    return jsonify({'menu': todays_menu}), 201
+
 @app.route('/api/v1/menu', methods=['GET'])
 def get_menu():
-    return jsonify({'menu': menu})
+    return jsonify({'menu': todays_menu}), 201
 
 
 #Endpoint to register user/ sign up

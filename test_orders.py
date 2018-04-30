@@ -14,7 +14,11 @@ GOOD_ITEM_URL = '{}/3'.format(BASE_URL)
 class TestOrders(unittest.TestCase):
     """Set up test variables"""
     def setUp(self):
-        self.backup_orders = deepcopy(app.orders)  
+        orders = [{"order_id": 1, "username": "Angie Kihara", 'meal': 'Pilau and chicken', 'quantity': 2},
+                {"order_id": 2, 'username': 'Victor Kubo', 'meal': 'Ugali, fish, vegetables and spices', 'quantity': 1},
+                {"order_id": 3, 'username': 'Charles Ngara', 'meal': 'Unripe cooked banana, stew, mutton, appetizer', 'quantity': 4}]
+
+        self.backup_orders = deepcopy(orders)  
         self.app = app.app.test_client()
         self.app.testing = True
 
@@ -90,9 +94,8 @@ class TestOrders(unittest.TestCase):
     def test_delete(self):
         """Test that user can get delete orders"""
         response = self.app.delete(GOOD_ITEM_URL)
-        self.assertEqual(response.status_code, 204)
-        response = self.app.delete(BAD_ITEM_URL)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        
 
     def tearDown(self):
         """reset app.orders to initial state"""
