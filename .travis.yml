@@ -13,7 +13,7 @@ script:
     - py.test
 
 after_success:
-    - coverage run --source='.' test_meals.py
+    - coverage run --source='.' --omit='run.py','config.py','manage.py', test_meals.py
     - coveralls
 
 cache: pip
