@@ -8,14 +8,14 @@ from functools import wraps
 import jwt
 import datetime
 
-#local imports
+# local imports
 from instance.config import app_config
 from app.models import Meal, User
 
 
-list_users=[]
-meals=[]
-orders=[]
+list_users = []
+meals = []
+orders = []
 menu = []
 
 NOT_FOUND = 'Not found'
@@ -30,33 +30,26 @@ def create_app(config_name):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = "some-very-long-string-of-random-characters-CHANGE-TO-YOUR-LIKING"
 
-
-    
-
     def _get_meal(id):
-      return [meal for meal in meals if meal['id'] == id]
-
+        return [meal for meal in meals if meal['id'] == id]
 
     def _meal_exists(name):
-      return [meal for meal in meals if meal["name"] == name]
+        return [meal for meal in meals if meal["name"] == name]
 
     def _get_user(id):
-      return [user for user in users if user['id'] == id]
-
+        return [user for user in users if user['id'] == id]
 
     def _user_exists(email):
-      return [user for user in users if user["email"] == email]
+        return [user for user in users if user["email"] == email]
 
     def _get_order(id):
-      return [order for order in orders if order[username] == username]
-
+        return [order for order in orders if order[username] == username]
 
     @app.route('/api/v1/meals', methods=['GET'])
     def get_meals():
         """Route returns list of all meals in database"""
         return jsonify({'meals': meals})
 
-    
     @app.route('/api/v1/meals/<int:id>', methods=['GET'])
     def get_meal(id):
         """Get just one meal using its id"""
@@ -65,7 +58,6 @@ def create_app(config_name):
             abort(404)
         return jsonify({'meal': meal})
 
-    
     @app.route('/api/v1/meals', methods=['POST'])
     def create_meal():
         """Add meals to list of meals already available"""
@@ -77,14 +69,13 @@ def create_app(config_name):
         if _meal_exists(name):
             abort(400)
         price = request.json.get('price')
-        if type(price) is not int:
+        if not isinstance(price, int):
             abort(400)
         meal = {"id": meal_id, "name": name,
-                "ingredients": ingredients,"price": price}
+                "ingredients": ingredients, "price": price}
         meals.append(meal)
         return jsonify({'meal': meal}), 201
 
-    
     @app.route('/api/v1/meals/<int:id>', methods=['PUT'])
     def update_meal(id):
         """Change values of an already existing meal"""
@@ -96,14 +87,13 @@ def create_app(config_name):
         name = request.json.get('name', meal[0]['name'])
         ingredients = request.json.get('ingredients', meal[0]['ingredients'])
         price = request.json.get('price', meal[0]['price'])
-        if type(price) is not int:
+        if not isinstance(price, int):
             abort(400)
         meal[0]['name'] = name
         meal[0]['ingredients'] = ingredients
         meal[0]['price'] = price
         return jsonify({'meal': meal[0]}), 200
 
-    
     @app.route('/api/v1/meals/<int:id>', methods=['DELETE'])
     def delete_meal(id):
         """Delete meal using id"""
@@ -113,7 +103,6 @@ def create_app(config_name):
         else:
             return jsonify({'message': 'Meal does not exist'})
 
-    
     @app.route('/api/v1/orders/<int:order_id>', methods=['GET'])
     def get_order(order_id):
         """Get just one order using order_id"""
@@ -121,7 +110,6 @@ def create_app(config_name):
         if not order:
             abort(404)
         return jsonify({'order': order})
-
 
     @app.route('/api/v1/orders', methods=['POST'])
     def create_order():
@@ -134,13 +122,12 @@ def create_app(config_name):
         if _order_exists(username):
             abort(400)
         quantity = request.json.get('quantity')
-        if type(quantity) is not int:
+        if not isinstance(quantity, int):
             abort(400)
         order = {"order_id": order_id, "username": username,
-                "meal": meal,"quantity": quantity}
+                 "meal": meal, "quantity": quantity}
         orders.append(order)
         return jsonify({'order': order}), 201
-
 
     @app.route('/api/v1/orders/<int:order_id>', methods=['PUT'])
     def update_order(order_id):
@@ -153,13 +140,12 @@ def create_app(config_name):
         username = request.json.get('username', order[0]['username'])
         meal = request.json.get('meal', order[0]['meal'])
         quantity = request.json.get('quantity', order[0]['quantity'])
-        if type(quantity) is not int:
+        if not isinstance(quantity, int):
             abort(400)
         order[0]['username'] = username
         order[0]['meal'] = meal
         order[0]['quantity'] = quantity
         return jsonify({'order': order[0]}), 200
-
 
     @app.route('/api/v1/orders/<int:order_id>', methods=['DELETE'])
     def delete_order(order_id):
@@ -168,9 +154,9 @@ def create_app(config_name):
         if order:
             del order
         else:
-            return jsonify ({'message': 'Order does not exist'})
+            return jsonify({'message': 'Order does not exist'})
 
-    #Get menu from menu list
+    # Get menu from menu list
     @app.route('/api/v1/menu', methods=['GET'])
     def get_menu():
         return jsonify({'menu': menu})
@@ -186,40 +172,43 @@ def create_app(config_name):
 
         return jsonify({'menu': todays_menu}), 201
 
-    
     @app.route('/auth/signup', methods=['POST'])
     def create_user():
         data = request.get_json(force=True)
         caterer = data['caterer'] or False
 
-        hashed_password = generate_password_hash(data['password'], method='sha256')
-        new_user = User(user_id=4, username=data['username'], email=data['email'], password=hashed_password, caterer=caterer)
+        hashed_password = generate_password_hash(
+            data['password'], method='sha256')
+        new_user = User(
+            user_id=4,
+            username=data['username'],
+            email=data['email'],
+            password=hashed_password,
+            caterer=caterer)
 
         list_users.append(new_user)
 
-        return jsonify({'message' : 'New user created!'}), 201
+        return jsonify({'message': 'New user created!'}), 201
 
-    
     def get_by_email(email):
-        
+
         for user in list_users:
             if user.email == email:
                 return user
 
-    
     @app.route('/auth/login', methods=['POST'])
     def login():
         data = request.get_json(force=True)
         email = data['email']
         password = data['password']
 
-
         user = get_by_email(email)
         if user and check_password_hash(user.password, password):
-            token = jwt.encode({'user' : user.email, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(seconds=15)}, str(app.config['SECRET_KEY']))
-            return jsonify({'token' : token.decode('UTF-8'), 'message': 'Login successful!!'}), 200
-        return make_response(jsonify({'message':'Invalid email or password, Please try again.'}), 401)
-    
-    return app
+            token = jwt.encode({'user': user.email, 'exp': datetime.datetime.utcnow(
+            ) + datetime.timedelta(seconds=15)}, str(app.config['SECRET_KEY']))
+            return jsonify({'token': token.decode('UTF-8'),
+                            'message': 'Login successful!!'}), 200
+        return make_response(
+            jsonify({'message': 'Invalid email or password, Please try again.'}), 401)
 
-    
+    return app
