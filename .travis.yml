@@ -9,7 +9,7 @@ script:
   - python -m pytest --cov-report term-missing --cov=app
 
 after_success:
-  - coverage run --source='.' 
+  - coverage run --source='.' python -m pytest --cov-report term-missing --cov=app
   - coveralls
 
 cache: pip
