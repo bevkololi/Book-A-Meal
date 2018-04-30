@@ -39,11 +39,10 @@ class Caterer(User):
 caterer1 = Caterer ("Mike Sonko", "sonko@gmail.com", "pass1234", "Caterer")
 
 TODAY = datetime.utcnow().date()
-#Same as class menu
-# class Menu(BaseModel):
-#     def __init__(self, meals, date=TODAY):
-#         self.meals = meals
-#         self.date = str(date)
+class Menu(BaseModel):
+    def __init__(self, meals, date=TODAY):
+        self.meals = meals
+        self.date = str(date)
     
 
 class Order(BaseModel):
