@@ -17,7 +17,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Configurations for Testing."""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI ="postgresql://postgres:kololi@localhost/bam"
+    SQLALCHEMY_DATABASE_URI ="postgresql://postgres:kololi@localhost/test2"
     DEBUG = True
 
 
