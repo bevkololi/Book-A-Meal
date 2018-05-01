@@ -16,6 +16,75 @@ def create_app(config_name):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
 
+    @app.route('/api/v1/meals/', methods=['POST', 'GET'])
+    def mealss():
+        if request.method == "POST":
+            name = str(request.data.get('name', ''))
+            if name:
+                meal = Meal(name=name)
+                meal.save()
+                response = jsonify({
+                    'id': meal.id,
+                    'name': meal.name,
+                    'description': meal.description,
+                    'price': meal.price
+                })
+                response.status_code = 201
+                return response
+        else:
+            # GET
+            meals = Meal.get_all()
+            results = []
+
+            for meal in meals:
+                obj = {
+                    'id': meal.id,
+                    'name': meal.name,
+                    'description': meal.description,
+                    'price': meal.price
+                }
+                results.append(obj)
+            response = jsonify(results)
+            response.status_code = 200
+            return response
+
+    @app.route('/api/v1/meals/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+    def meal_manipulation(id, **kwargs):
+     # retrieve a meal using it's ID
+        meal = Meal.query.filter_by(id=id).first()
+        if not meal:
+            # Raise an HTTPException with a 404 not found status code
+            abort(404)
+
+        if request.method == 'DELETE':
+            meal.delete()
+            return {
+            "message": "meal {} deleted successfully".format(meal.id) 
+         }, 200
+
+        elif request.method == 'PUT':
+            name = str(request.data.get('name', ''))
+            meal.name = name
+            meal.save()
+            response = jsonify({
+                'id': meal.id,
+                'name': meal.name,
+                'description': meal.description,
+                'price': meal.price
+            })
+            response.status_code = 200
+            return response
+        else:
+            # GET
+            response = jsonify({
+                'id': meal.id,
+                'name': meal.name,
+                'description': meal.description,
+                'price': meal.price
+            })
+            response.status_code = 200
+            return response
+
 
     
 
