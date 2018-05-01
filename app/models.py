@@ -15,10 +15,13 @@ class User(db.Model):
     username = db.Column(db.String(256), nullable=False)
     email = db.Column(db.String(256), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
+    orders = db.relationship(
+        'Order' ,order_by='Order.id', cascade="all, delete-orphan")
     
 
-    def __init__(self, email, password):
+    def __init__(self, username, email, password):
         """Initialize the user with an email and a password."""
+        self.username = username
         self.email = email
         self.password = Bcrypt().generate_password_hash(password).decode()
 
@@ -79,6 +82,8 @@ class Meal(db.Model):
     name = db.Column(db.String(255))
     description = db.Column(db.String(255))
     price = db.Column(db.Integer())
+    # orders = db.relationship(
+    #     'Order' ,order_by='Order.id', cascade="all, delete-orphan")
     
 
     def __init__(self, name, price, description):
@@ -90,8 +95,8 @@ class Meal(db.Model):
 
     def save(self):
         """Save a meal.
-        This applies for both creating a new bucketlist
-        and updating an existing onupdate
+        This applies for both creating a new meal
+        and updating an existing meal
         """
         db.session.add(self)
         db.session.commit()
@@ -110,3 +115,47 @@ class Meal(db.Model):
     def __repr__(self):
         """Return a representation of a meal instance."""
         return "<Meal: {}>".format(self.meal)
+
+
+class Order(db.Model):
+    """This class defines the order table."""
+
+    __tablename__ = 'orders'
+
+    # define the columns of the table, starting with its primary key
+    id = db.Column(db.Integer, primary_key=True)
+    meal = db.Column(db.String(255))
+    quantity = db.Column(db.Integer())
+    time_ordered = db.Column(db.DateTime, default=db.func.current_timestamp())
+    ordered_by = db.Column(db.Integer, db.ForeignKey(User.id))
+    
+
+
+    def __init__(self, meals, quantity, time_ordered, ordered_by):
+        """Initialize the order with a name and its creator."""
+        self.meals = meals
+        self.ordered_by = ordered_by
+        self.quantity = quantity
+        self.time_ordered = time_ordered
+
+    def save(self):
+        """Save a order.
+        This applies for both creating a new order
+        and updating an existing onupdate
+        """
+        db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_all(user_id):
+        """This method gets all the orders for a given user."""
+        return Order.query.filter_by(ordered_by=user_id)
+
+    def delete(self):
+        """Deletes a given bucketlist."""
+        db.session.delete(self)
+        db.session.commit()
+
+    def __repr__(self):
+        """Return a representation of an order instance."""
+        return "<Order: {}>".format(self.meals)
