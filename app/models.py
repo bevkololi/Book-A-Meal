@@ -10,7 +10,7 @@ class Meal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     description = db.Column(db.String(255))
-    price = db.Column(db.Integer(80))
+    price = db.Column(db.Integer())
 
     def __init__(self, name):
         """initialize with name."""
