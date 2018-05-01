@@ -12,16 +12,25 @@ def create_app(config_name):
     from app.models import Meal
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
+    app.url_map.strict_slashes = False
     app.config.from_pyfile('config.py')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
 
     @app.route('/api/v1/meals/', methods=['POST', 'GET'])
-    def mealss():
+    def meals():
         if request.method == "POST":
             name = str(request.data.get('name', ''))
+            description = str(request.data.get('description', ''))
+            price = str(request.data.get('price', ''))
+            if price:
+            	int(price)
+            else:
+            	{"message": "Price should be a number" 
+         }, 200
+
             if name:
-                meal = Meal(name=name)
+                meal = Meal(name=name, description=description, price=price)
                 meal.save()
                 response = jsonify({
                     'id': meal.id,

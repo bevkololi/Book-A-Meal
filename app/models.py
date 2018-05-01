@@ -81,13 +81,15 @@ class Meal(db.Model):
     price = db.Column(db.Integer())
     
 
-    def __init__(self, name):
+    def __init__(self, name, price, description):
         """Initialize the bucketlist with a name and its creator."""
         self.name = name
+        self.description = description
+        self.price = price
         
 
     def save(self):
-        """Save a bucketlist.
+        """Save a meal.
         This applies for both creating a new bucketlist
         and updating an existing onupdate
         """
@@ -101,10 +103,10 @@ class Meal(db.Model):
     
 
     def delete(self):
-        """Deletes a given bucketlist."""
+        """Deletes a given meal."""
         db.session.delete(self)
         db.session.commit()
 
     def __repr__(self):
-        """Return a representation of a bucketlist instance."""
+        """Return a representation of a meal instance."""
         return "<Meal: {}>".format(self.meal)

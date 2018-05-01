@@ -11,7 +11,7 @@ class MealTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.app = create_app(config_name="testing")
         self.client = self.app.test_client
-        self.meal = {'name': 'Ugali and sukuma wiki'}
+        self.meal = {'name': 'Ugali and sukuma wiki', 'description': 'This is ugali description', 'price': 20}
 
         # binds the app to the current context
         with self.app.app_context():
@@ -46,7 +46,7 @@ class MealTestCase(unittest.TestCase):
         """Test API can edit an existing meal. (PUT request)"""
         rv = self.client().post(
             'api/v1/meals/',
-            data={'name': 'Spaghetti and rice'})
+            data={'name': 'Spaghetti and rice', 'description': 'This is a description of ugali and sukuma wiki', 'price': 40})
         self.assertEqual(rv.status_code, 201)
         rv = self.client().put(
             'api/v1/meals/1',
@@ -61,7 +61,7 @@ class MealTestCase(unittest.TestCase):
         """Test API can delete an existing meal. (DELETE request)."""
         rv = self.client().post(
             'api/v1/meals/',
-            data={'name': 'Spaghetti and rice'})
+            data={'name': 'Spaghetti and rice', 'description': 'This is a description of ugali and sukuma wiki', 'price': 40})
         self.assertEqual(rv.status_code, 201)
         res = self.client().delete('api/v1/meals/1')
         self.assertEqual(res.status_code, 200)
