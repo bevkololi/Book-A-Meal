@@ -1,68 +1,35 @@
+# app/models.py
 
-"""Contains models for users, meals, menu and orders"""
-#third party imports
-from datetime import datetime, date, timedelta
-from collections import OrderedDict
-import json
+from app import db
 
+class Meal(db.Model):
+    """This class represents the bucketlist table."""
 
-class BaseModel:   
-    @classmethod
-    def create_dict(cls):
-        return cls.__dict__
+    __tablename__ = 'meals'
 
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80))
+    description = db.Column(db.String(255))
+    price = db.Column(db.Integer(80))
 
-class Meal(BaseModel):
-    """Initializing Meal class"""
-    def __init__(self, name, ingredients, price, id):
-        self.id = id
+    def __init__(self, name):
+        """initialize with name."""
         self.name = name
-        self.ingredients = ingredients
-        self.price = price
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 
+    @staticmethod
+    def get_all():
+        return Meal.query.all()
 
-class User(BaseModel):
-    """Has similar data structure to class meal"""
-    def __init__(self, user_id, username, email, password, caterer=False):
-        self.user_id = user_id
-        self.username = username
-        self.email = email
-        self.password = password
-        self.caterer = caterer
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
- 
-class Caterer(User):
-    def __init__(self, username, email, password, caterer=True):
-        super().__init__(self, username, email, password)
-        self.caterer = caterer
-caterer1 = Caterer ("Mike Sonko", "sonko@gmail.com", "pass1234", "Caterer")
+    def __repr__(self):
+        return "<Meal: {}>".format(self.name)
 
-TODAY = datetime.utcnow().date()
-#Same as class menu
-# class Menu(BaseModel):
-#     def __init__(self, meals, date=TODAY):
-#         self.meals = meals
-#         self.date = str(date)
-    
-
-class Order(BaseModel):
-    def __init__(self, order_id, username, meal, quantity):
-        self.order_id = order_id
-        self.username = username
-        self.meal = meal
-        self.quantity = quantity
-
-
-
-
-
-    
-
-
-
-        
-    
-
-
+# 
 
