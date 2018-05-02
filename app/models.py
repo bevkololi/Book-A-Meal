@@ -4,6 +4,11 @@ from flask import current_app
 import jwt
 from datetime import datetime, timedelta
 
+MENU_ASSOCIATIONS = db.Table(
+    'meal_associations',
+    db.Column('menu_id', db.Integer(), db.ForeignKey('menu.id')),
+    db.Column('meal_id', db.Integer(), db.ForeignKey('meals.id')))
+
 
 class User(db.Model):
     """This class defines the users table """
@@ -16,7 +21,7 @@ class User(db.Model):
     email = db.Column(db.String(256), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
     orders = db.relationship(
-        'Order' ,order_by='Order.id', cascade="all, delete-orphan")
+        'Order', order_by='Order.id', cascade="all, delete-orphan")
     
 
     def __init__(self, username, email, password):
@@ -159,3 +164,42 @@ class Order(db.Model):
     def __repr__(self):
         """Return a representation of an order instance."""
         return "<Order: {}>".format(self.meals)
+
+
+class Menu(db.Model):
+    """This class defines the order table."""
+
+    __tablename__ = 'menu'
+
+    # define the columns of the table, starting with its primary key
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, default=datetime.utcnow())
+    meals = db.relationship(
+        'Meal', secondary='meal_associations', backref=db.backref('meals', lazy=True, uselist=True))
+    
+    
+
+
+    def __init__(self, meals, date=datetime.utcnow().date()):
+        """Initialize the order with a name and its creator."""
+        self.date
+        self.meals = meals
+
+    def save(self):
+        """Save a menu.
+        This applies for both creating a new order
+        and updating an existing onupdate
+        """
+        db.session.add(self)
+        db.session.commit()
+
+    
+
+    def delete(self):
+        """Deletes a given bucketlist."""
+        db.session.delete(self)
+        db.session.commit()
+
+    def __repr__(self):
+        """Return a representation of an order instance."""
+        return "<Menu: {}>".format(self.menu)
