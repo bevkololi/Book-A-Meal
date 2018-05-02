@@ -1,6 +1,6 @@
 from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
-from flask import request, jsonify, abort
+from flask import request, jsonify, abort, make_response
 
 # local import
 from instance.config import app_config
@@ -9,7 +9,7 @@ from instance.config import app_config
 db = SQLAlchemy()
 
 def create_app(config_name):
-    from app.models import Meal
+    from app.models import Meal, User
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
     app.url_map.strict_slashes = False
@@ -19,80 +19,113 @@ def create_app(config_name):
 
     @app.route('/api/v1/meals/', methods=['POST', 'GET'])
     def meals():
-        if request.method == "POST":
-            name = str(request.data.get('name', ''))
-            description = str(request.data.get('description', ''))
-            price = str(request.data.get('price', ''))
-            if price:
-            	int(price)
+        # get the access token
+        auth_header = request.headers.get('Authorization')
+        access_token = auth_header.split(" ")[1]
+
+        if access_token:
+            user_id = User.decode_token(access_token)
+            if not isinstance(user_id, str):
+                # Go ahead and handle the request, the user is authed
+                if request.method == "POST":
+                    name = str(request.data.get('name', ''))
+                    description = str(request.data.get('description', ''))
+                    price = str(request.data.get('price', ''))
+                    if price:
+                        int(price)
+                    else:
+                        {"message": "Price should be a number" 
+                 }, 200
+                    if name:
+                        meal = Meal(name=name, description=description, price=price)
+                        meal.save()
+                        response = jsonify({
+                            'id': meal.id,
+                            'name': meal.name,
+                            'description': meal.description,
+                            'price': meal.price
+                        })
+
+                        return make_response(response), 201
+
+                else:
+                    # GET
+                    # get all the bucketlists for this user
+                    meals = Meal.get_all()
+                    results = []
+
+                    for meal in meals:
+                        obj = {
+                            'id': meal.id,
+                            'name': meal.name,
+                            'description': meal.description,
+                            'price': meal.price
+                        }
+                        results.append(obj)
+
+                    return make_response(jsonify(results)), 200
             else:
-            	{"message": "Price should be a number" 
-         }, 200
-
-            if name:
-                meal = Meal(name=name, description=description, price=price)
-                meal.save()
-                response = jsonify({
-                    'id': meal.id,
-                    'name': meal.name,
-                    'description': meal.description,
-                    'price': meal.price
-                })
-                response.status_code = 201
-                return response
-        else:
-            # GET
-            meals = Meal.get_all()
-            results = []
-
-            for meal in meals:
-                obj = {
-                    'id': meal.id,
-                    'name': meal.name,
-                    'description': meal.description,
-                    'price': meal.price
+                # user is not legit, so the payload is an error message
+                response = {
+                    'message': 'Please input access token'
                 }
-                results.append(obj)
-            response = jsonify(results)
-            response.status_code = 200
-            return response
+                return make_response(jsonify(response)), 401
 
     @app.route('/api/v1/meals/<int:id>', methods=['GET', 'PUT', 'DELETE'])
-    def meal_manipulation(id, **kwargs):
-     # retrieve a meal using it's ID
-        meal = Meal.query.filter_by(id=id).first()
-        if not meal:
-            # Raise an HTTPException with a 404 not found status code
-            abort(404)
+    def meals_manipulation(id, **kwargs):
 
-        if request.method == 'DELETE':
-            meal.delete()
-            return {
-            "message": "meal {} deleted successfully".format(meal.id) 
-         }, 200
+        auth_header = request.headers.get('Authorization')
+        access_token = auth_header.split(" ")[1]
 
-        elif request.method == 'PUT':
-            name = str(request.data.get('name', ''))
-            meal.name = name
-            meal.save()
-            response = jsonify({
-                'id': meal.id,
-                'name': meal.name,
-                'description': meal.description,
-                'price': meal.price
-            })
-            response.status_code = 200
-            return response
-        else:
-            # GET
-            response = jsonify({
-                'id': meal.id,
-                'name': meal.name,
-                'description': meal.description,
-                'price': meal.price
-            })
-            response.status_code = 200
-            return response
+        if access_token:
+            user_id = User.decode_token(access_token)
+            if not isinstance(user_id, str):
+                meal = Meal.query.filter_by(id=id).first()
+                if not meal:
+                    # Raise an HTTPException with a 404 not found status code
+                    abort(404)
+
+                if request.method == "DELETE":
+                    meal.delete()
+                    return {
+                        "message": "meal {} deleted".format(meal.id)
+                    }, 200
+                elif request.method == 'PUT':
+                    name = str(request.data.get('name', ''))
+                    description = str(request.data.get('description', ''))
+                    price = str(request.data.get('price', ''))
+                    if price:
+                        int(price)
+                    else:
+                        {"message": "Price should be a number" 
+                 }, 200
+                    meal.name = name
+                    meal.description = description
+                    meal.price = price
+                    meal.save()
+                    response = {
+                        'id': meal.id,
+                        'name': meal.name,
+                        'description': meal.description,
+                        'price': meal.price
+                    }
+                    return make_response(jsonify(response)), 200
+                else:
+                    # GET
+                    response = jsonify({
+                        'id': meal.id,
+                        'name': meal.name,
+                        'description': meal.description,
+                        'price': meal.price
+                    })
+                    return make_response(response), 200
+            else:
+                # user is not legit, so the payload is an error message
+                
+                response = {
+                    'message': 'Please input access token'
+                }
+                return make_response(jsonify(response)), 401
 
     # import the authentication blueprint and register it on the app
     from .auth import auth_blueprint
