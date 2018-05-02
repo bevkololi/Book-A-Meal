@@ -47,11 +47,13 @@ class User(db.Model):
         """Generates the access token to be used as the Authorization header"""
 
         try:
-           payload = {
+            # set up a payload with an expiration time
+            payload = {
                 'exp': datetime.utcnow() + timedelta(minutes=5),
                 'iat': datetime.utcnow(),
                 'sub': user_id
             }
+            # create the byte string token using the payload and the SECRET key
             jwt_string = jwt.encode(
                 payload,
                 current_app.config.get('SECRET'),
@@ -60,6 +62,7 @@ class User(db.Model):
             return jwt_string
 
         except Exception as e:
+            # return an error in string format if an exception occurs
             return str(e)
 
     @staticmethod
@@ -134,15 +137,14 @@ class Order(db.Model):
     
 
 
-    def __init__(self, meals, quantity, time_ordered, ordered_by):
+    def __init__(self, meal, quantity):
         """Initialize the order with a name and its creator."""
-        self.meals = meals
-        self.ordered_by = ordered_by
+        self.meal = meal
         self.quantity = quantity
-        self.time_ordered = time_ordered
+        
 
     def save(self):
-        """Save a order.
+        """Save an order.
         This applies for both creating a new order
         and updating an existing onupdate
         """
@@ -155,13 +157,13 @@ class Order(db.Model):
         return Order.query.filter_by(ordered_by=user_id)
 
     def delete(self):
-        """Deletes a given bucketlist."""
+        """Deletes a given meal."""
         db.session.delete(self)
         db.session.commit()
 
     def __repr__(self):
         """Return a representation of an order instance."""
-        return "<Order: {}>".format(self.meals)
+        return "<Order: {}>".format(self.order)
 
 
 class Menu(db.Model):
