@@ -13,7 +13,7 @@ class MealTestCase(unittest.TestCase):
         self.client = self.app.test_client
         self.meal = {'name': 'Ugali and sukuma wiki', 'description': 'This is ugali description', 'price': 20}
 
-        # binds the app to the current context
+        
         with self.app.app_context():
             # create all tables
             db.session.close()
@@ -111,6 +111,6 @@ class MealTestCase(unittest.TestCase):
             db.session.remove()
             db.drop_all()
 
-# Make the tests conveniently executable
+
 if __name__ == "__main__":
     unittest.main()

@@ -5,7 +5,7 @@ from flask import request, jsonify, abort, make_response
 # local import
 from instance.config import app_config
 
-# initialize sql-alchemy
+
 db = SQLAlchemy()
 
 def create_app(config_name):
@@ -19,14 +19,12 @@ def create_app(config_name):
 
     @app.route('/api/v1/meals/', methods=['POST', 'GET'])
     def meals():
-        # get the access token
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
 
         if access_token:
             user_id = User.decode_token(access_token)
             if not isinstance(user_id, str):
-                # Go ahead and handle the request, the user is authed
                 if request.method == "POST":
                     name = str(request.data.get('name', ''))
                     description = str(request.data.get('description', ''))
@@ -49,8 +47,6 @@ def create_app(config_name):
                         return make_response(response), 201
 
                 else:
-                    # GET
-                    # get all the bucketlists for this user
                     meals = Meal.get_all()
                     results = []
 
@@ -65,7 +61,6 @@ def create_app(config_name):
 
                     return make_response(jsonify(results)), 200
             else:
-                # user is not legit, so the payload is an error message
                 response = {
                     'message': 'Please input access token'
                 }
@@ -82,7 +77,6 @@ def create_app(config_name):
             if not isinstance(user_id, str):
                 meal = Meal.query.filter_by(id=id).first()
                 if not meal:
-                    # Raise an HTTPException with a 404 not found status code
                     abort(404)
 
                 if request.method == "DELETE":
@@ -111,7 +105,6 @@ def create_app(config_name):
                     }
                     return make_response(jsonify(response)), 200
                 else:
-                    # GET
                     response = jsonify({
                         'id': meal.id,
                         'name': meal.name,
@@ -120,14 +113,13 @@ def create_app(config_name):
                     })
                     return make_response(response), 200
             else:
-                # user is not legit, so the payload is an error message
-                
+                              
                 response = {
                     'message': 'Please input access token'
                 }
                 return make_response(jsonify(response)), 401
 
-    # import the authentication blueprint and register it on the app
+    
     from .auth import auth_blueprint
     app.register_blueprint(auth_blueprint)
     

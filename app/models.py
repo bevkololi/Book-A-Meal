@@ -15,7 +15,7 @@ class User(db.Model):
 
     __tablename__ = 'users'
 
-    # Define the columns of the users table, starting with the primary key
+    
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(256), nullable=False)
     email = db.Column(db.String(256), nullable=False, unique=True)
@@ -47,13 +47,11 @@ class User(db.Model):
         """Generates the access token to be used as the Authorization header"""
 
         try:
-            # set up a payload with an expiration time
-            payload = {
+           payload = {
                 'exp': datetime.utcnow() + timedelta(minutes=5),
                 'iat': datetime.utcnow(),
                 'sub': user_id
             }
-            # create the byte string token using the payload and the SECRET key
             jwt_string = jwt.encode(
                 payload,
                 current_app.config.get('SECRET'),
@@ -62,7 +60,6 @@ class User(db.Model):
             return jwt_string
 
         except Exception as e:
-            # return an error in string format if an exception occurs
             return str(e)
 
     @staticmethod
@@ -82,7 +79,6 @@ class Meal(db.Model):
 
     __tablename__ = 'meals'
 
-    # define the columns of the table, starting with its primary key
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
     description = db.Column(db.String(255))
@@ -98,6 +94,7 @@ class Meal(db.Model):
         self.price = price
         
 
+
     def save(self):
         """Save a meal.
         This applies for both creating a new meal
@@ -110,7 +107,9 @@ class Meal(db.Model):
     def get_all():
         return Meal.query.all()
 
-    
+    def add_to_menu():
+        """Add meal to today's menu"""
+
 
     def delete(self):
         """Deletes a given meal."""
@@ -127,7 +126,6 @@ class Order(db.Model):
 
     __tablename__ = 'orders'
 
-    # define the columns of the table, starting with its primary key
     id = db.Column(db.Integer, primary_key=True)
     meal = db.Column(db.String(255))
     quantity = db.Column(db.Integer())
@@ -184,6 +182,7 @@ class Menu(db.Model):
         """Initialize the order with a name and its creator."""
         self.date
         self.meals = meals
+
 
     def save(self):
         """Save a menu.
