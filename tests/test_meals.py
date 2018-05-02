@@ -83,7 +83,7 @@ class MealTestCase(unittest.TestCase):
         rv = self.client().put(
             'api/v1/meals/1', headers=dict(Authorization="Bearer " + access_token),
             data={
-                "name": "Spaghetti, rice and stewed meat"
+                'name': 'Spaghetti and rice and stewed meat', 'description': 'This is a description of ugali and sukuma wiki', 'price': 40
             })
         self.assertEqual(rv.status_code, 200)
         results = self.client().get('api/v1/meals/1', headers=dict(Authorization="Bearer " + access_token))
@@ -95,7 +95,7 @@ class MealTestCase(unittest.TestCase):
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
         rv = self.client().post(
-            'api/v1/meals/',
+            'api/v1/meals/', headers=dict(Authorization="Bearer " + access_token),
             data={'name': 'Spaghetti and rice', 'description': 'This is a description of ugali and sukuma wiki', 'price': 40})
         self.assertEqual(rv.status_code, 201)
         res = self.client().delete('api/v1/meals/1', headers=dict(Authorization="Bearer " + access_token))
