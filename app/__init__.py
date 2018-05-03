@@ -263,7 +263,7 @@ def create_app(config_name):
                         'username': meal.username,
                         'email': user.email,
                         'password': user.password,
-                        'caterer': False
+                        'caterer': user.caterer
                     }
                     return make_response(jsonify(response)), 200
                 else:
@@ -272,13 +272,45 @@ def create_app(config_name):
                         'username': user.username,
                         'email': user.email,
                         'password': user.password,
-                        'caterer': False
+                        'caterer': user.caterer
                     })
                     return make_response(response), 200
             else:
                               
                 response = {
                     'message': 'Please input access token'
+                }
+                return make_response(jsonify(response)), 401
+
+    
+    @app.route('/api/v1/promote/user/<int:id>', methods=['PUT'])
+    def promote_user(id, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        access_token = auth_header.split(" ")[1]
+
+        if access_token:
+            user_id = User.decode_token(access_token)
+            if not isinstance(user_id, str):
+                user = User.query.filter_by(id=id).first()
+                if not user:
+                    abort(404)
+
+                
+                if request.method == "PUT":
+                    user.caterer = True
+                    user.save()                   
+                
+
+                    if not user:
+                        return jsonify({'message' : 'No user found!'})
+
+                    
+                    
+                    return jsonify({'message' : 'The user has been promoted to caterer!'})
+            else:
+                message = user_id
+                response = {
+                    'message': message
                 }
                 return make_response(jsonify(response)), 401
 
