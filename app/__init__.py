@@ -1,6 +1,7 @@
 from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
 from flask import request, jsonify, abort, make_response
+from datetime import datetime, timedelta
 
 # local import
 from instance.config import app_config
@@ -12,7 +13,7 @@ BAD_REQUEST = 'Bad request'
 db = SQLAlchemy()
 
 def create_app(config_name):
-    from app.models import Meal, User, Order
+    from app.models import Meal, User, Order, Menu
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
     app.url_map.strict_slashes = False
@@ -227,6 +228,113 @@ def create_app(config_name):
                 }
                 return make_response(jsonify(response)), 401
 
+
+    
+
+    @app.route('/api/v1/users/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+    def users_manipulation(id, **kwargs):
+
+        auth_header = request.headers.get('Authorization')
+        access_token = auth_header.split(" ")[1]
+
+        if access_token:
+            user_id = User.decode_token(access_token)
+            if not isinstance(user_id, str):
+                user = User.query.filter_by(id=id).first()
+                if not user:
+                    abort(404)
+
+                if request.method == "DELETE":
+                    user.delete()
+                    return {
+                        "message": "user {} has been deleted".format(user.id)
+                    }, 200
+                elif request.method == 'PUT':
+                    username = str(request.data.get('user', ''))
+                    email = str(request.data.get('email', ''))
+                    password = str(request.data.get('password', ''))
+                    
+                    user.username = username
+                    user.email = email
+                    user.password = password
+                    user.save()
+                    response = {
+                        'id': user.id,
+                        'username': meal.username,
+                        'email': user.email,
+                        'password': user.password,
+                        'caterer': False
+                    }
+                    return make_response(jsonify(response)), 200
+                else:
+                    response = jsonify({
+                        'id': user.id,
+                        'username': user.username,
+                        'email': user.email,
+                        'password': user.password,
+                        'caterer': False
+                    })
+                    return make_response(response), 200
+            else:
+                              
+                response = {
+                    'message': 'Please input access token'
+                }
+                return make_response(jsonify(response)), 401
+
+
+    # @app.route('/api/v1/menu/', methods=['POST', 'GET'])
+    # def menu():
+    #     auth_header = request.headers.get('Authorization')
+    #     access_token = auth_header.split(" ")[1]
+
+    #     if access_token:
+    #         user_id = User.decode_token(access_token)
+    #         if not isinstance(user_id, str):
+    #             if request.method == "POST":
+    #                 meal = Meal(name='sqaunch', description='double squanch', price=50)
+    #                 meal.save() #str(request.data.get('meals'))
+    #                 # date = request.data.get('date', '')
+    #                 if meal:
+    #                     menu = Menu(meals=meal, date=datetime.utcnow().date())
+    #                     menu.add_meal_to_menu(meals)
+    #                     menu.save()
+    #                     response = {
+    #                         'id': menu.id,
+    #                         'date': menu.date,
+    #                         'meals': menu.meals,                            
+    #                     }
+    #                 return make_response(jsonify(response)), 200
+                    
+    #             else:
+    #                 today = datetime.utcnow().date()
+    #                 menu = Menu.query.filter_by(date=today).first()
+    #                 results = []
+
+    #                 if menu:
+    #                     obj = {
+    #                         'id': menu.id,
+    #                         'date': menu.date,
+    #                         'meals': menu.meals,
+    #                     }
+    #                     results.append(obj)
+
+    #                 return make_response(jsonify(results)), 200
+    #         else:
+    #             message = user_id
+    #             response = {
+    #                 'message': message
+    #             }
+    #             return make_response(jsonify(response)), 401
+
+
+
+                    
+
+
+
+                    
+    
     
     from .auth import auth_blueprint
     app.register_blueprint(auth_blueprint)
