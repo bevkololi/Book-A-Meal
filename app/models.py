@@ -22,6 +22,7 @@ class User(db.Model):
     password = db.Column(db.String(256), nullable=False)
     orders = db.relationship(
         'Order', order_by='Order.id', cascade="all, delete-orphan")
+
     
 
     def __init__(self, username, email, password):
@@ -125,23 +126,22 @@ class Meal(db.Model):
 
 
 class Order(db.Model):
-    """This class defines the order table."""
+    """This class defines the orders table."""
 
     __tablename__ = 'orders'
 
+    # define the columns of the table, starting with its primary key
     id = db.Column(db.Integer, primary_key=True)
     meal = db.Column(db.String(255))
     quantity = db.Column(db.Integer())
     time_ordered = db.Column(db.DateTime, default=db.func.current_timestamp())
     ordered_by = db.Column(db.Integer, db.ForeignKey(User.id))
-    
 
-
-    def __init__(self, meal, quantity):
+    def __init__(self, meal, quantity, ordered_by):
         """Initialize the order with a name and its creator."""
         self.meal = meal
+        self.ordered_by = ordered_by
         self.quantity = quantity
-        
 
     def save(self):
         """Save an order.
@@ -156,14 +156,19 @@ class Order(db.Model):
         """This method gets all the orders for a given user."""
         return Order.query.filter_by(ordered_by=user_id)
 
+    @staticmethod
+    def get_all():
+        """This method gets all the orders for a given user."""
+        return Order.query.all()
+
     def delete(self):
-        """Deletes a given meal."""
+        """Deletes a given order."""
         db.session.delete(self)
         db.session.commit()
 
     def __repr__(self):
-        """Return a representation of an order instance."""
-        return "<Order: {}>".format(self.order)
+        """Return a representation of a order instance."""
+        return "<Order: {}>".format(self.meal)
 
 
 class Menu(db.Model):
