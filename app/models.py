@@ -3,9 +3,10 @@ from flask_bcrypt import Bcrypt
 from flask import current_app
 import jwt
 from datetime import datetime, timedelta
+from sqlalchemy.orm import relationship, backref
 
-MENU_ASSOCIATIONS = db.Table(
-    'meal_associations',
+menu_meals = db.Table(
+    'menu_meals',
     db.Column('menu_id', db.Integer(), db.ForeignKey('menu.id')),
     db.Column('meal_id', db.Integer(), db.ForeignKey('meals.id')))
 
@@ -20,6 +21,7 @@ class User(db.Model):
     username = db.Column(db.String(256), nullable=False)
     email = db.Column(db.String(256), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
+    caterer = db.Column(db.Boolean, default=False)
     orders = db.relationship(
         'Order', order_by='Order.id', cascade="all, delete-orphan")
 
@@ -30,6 +32,7 @@ class User(db.Model):
         self.username = username
         self.email = email
         self.password = Bcrypt().generate_password_hash(password).decode()
+        
 
     def password_is_valid(self, password):
         """
@@ -43,6 +46,16 @@ class User(db.Model):
         """
         db.session.add(self)
         db.session.commit()
+
+    @staticmethod
+    def get_all():
+        return User.query.all()
+
+    def delete(self):
+        """Deletes a given bucketlist."""
+        db.session.delete(self)
+        db.session.commit()
+
 
     def generate_token(self, user_id):
         """Generates the access token to be used as the Authorization header"""
@@ -111,10 +124,7 @@ class Meal(db.Model):
     def get_all():
         return Meal.query.all()
 
-    def add_to_menu():
-        """Add meal to today's menu"""
-
-
+    
     def delete(self):
         """Deletes a given meal."""
         db.session.delete(self)
@@ -178,17 +188,30 @@ class Menu(db.Model):
 
     # define the columns of the table, starting with its primary key
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.utcnow())
-    meals = db.relationship(
-        'Meal', secondary='meal_associations', backref=db.backref('meals', lazy=True, uselist=True))
+    date = db.Column(db.DateTime, default=datetime.utcnow().date(), unique=True)
+    meals = relationship(
+                'Meal', secondary='menu_meals', backref=backref('menu_meals', lazy=True, uselist=True))
     
     
 
 
-    def __init__(self, meals, date=datetime.utcnow().date()):
+    def __init__(self, date=datetime.utcnow().date()):
         """Initialize the order with a name and its creator."""
-        self.date
-        self.meals = meals
+        self.date = date
+        # self.meals = meals
+
+    
+    def add_meal_to_menu(self, meal):
+        '''Add meal to menu'''
+        today = datetime.utcnow().date()
+        if isinstance(meal, Meal):
+            setatrr(self, 'meals', meal)
+        # elif isinstance(meal, list):
+        #     setatrr(self, 'meals', meal)
+        else:
+            return False
+        # menu = Menu.query.filter_by(date=today).first()
+        
 
 
     def save(self):
@@ -208,4 +231,4 @@ class Menu(db.Model):
 
     def __repr__(self):
         """Return a representation of an order instance."""
-        return "<Menu: {}>".format(self.menu)
+        return '<Menu Date {}>'.format(self.date.ctime())
