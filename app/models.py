@@ -92,7 +92,7 @@ class User(db.Model):
 
 
 class Meal(db.Model):
-    """This class defines the bucketlist table."""
+    """This class defines te meal table."""
 
     __tablename__ = 'meals'
 
@@ -105,7 +105,7 @@ class Meal(db.Model):
     
 
     def __init__(self, name, price, description):
-        """Initialize the bucketlist with a name and its creator."""
+        """Initialize the meal with a name and its creator."""
         self.name = name
         self.description = description
         self.price = price
@@ -156,7 +156,7 @@ class Order(db.Model):
     def save(self):
         """Save an order.
         This applies for both creating a new order
-        and updating an existing onupdate
+        and updating an existing update
         """
         db.session.add(self)
         db.session.commit()
