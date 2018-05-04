@@ -14,11 +14,11 @@ class OrderTestCase(unittest.TestCase):
         self.order = {'meal': 'Ugali and sukuma wiki', 'quantity':2}
 
         
-        with self.app.app_context():
-            # create all tables
-            db.session.close()
-            db.drop_all()
-            db.create_all()
+        # with self.app.app_context():
+        #     # create all tables
+        #     db.session.close()
+        #     db.drop_all()
+        #     db.create_all()
 
     def register_user(self, username= 'Some user', email="user@test.com", password="test1234"):
         user_data = {

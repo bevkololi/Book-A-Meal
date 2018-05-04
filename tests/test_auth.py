@@ -15,10 +15,10 @@ class AuthTestCase(unittest.TestCase):
             'password': 'pass1234'
         }
 
-        with self.app.app_context():
-            db.session.close()
-            db.drop_all()
-            db.create_all()
+        # with self.app.app_context():
+        #     db.session.close()
+        #     db.drop_all()
+        #     db.create_all()
 
     def test_registration(self):
         """Test user registration works correcty."""
