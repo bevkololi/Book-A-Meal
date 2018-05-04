@@ -8,14 +8,11 @@ class RegistrationView(MethodView):
     """This class registers a new user."""
 
     def post(self):
-        """Handle POST request for this view. Url ---> /auth/register"""
-
         user = User.query.filter_by(email=request.data['email']).first()
 
         if not user:
             try:
                 post_data = request.data
-                # Register the user
                 username = post_data['username']
                 email = post_data['email']
                 password = post_data['password']
@@ -42,7 +39,6 @@ class LoginView(MethodView):
     """This class-based view handles user login and access token generation."""
 
     def post(self):
-        """Handle POST request for this view. Url ---> /auth/login"""
         try:
             user = User.query.filter_by(email=request.data['email']).first()
 
