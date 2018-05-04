@@ -104,12 +104,12 @@ class MealTestCase(unittest.TestCase):
         result = self.client().get('api/v1/meals/1', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 404)
 
-    def tearDown(self):
-        """teardown all initialized variables."""
-        with self.app.app_context():
-            # drop all tables
-            db.session.remove()
-            db.drop_all()
+    # def tearDown(self):
+    #     """teardown all initialized variables."""
+    #     with self.app.app_context():
+    #         # drop all tables
+    #         db.session.remove()
+    #         db.drop_all()
 
 
 # if __name__ == "__main__":

@@ -103,11 +103,11 @@ class OrderTestCase(unittest.TestCase):
         result = self.client().get('api/v1/orders/1', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 404)
 
-    def tearDown(self):
-        """teardown all initialized variables."""
-        with self.app.app_context():
-            db.session.remove()
-            db.drop_all()
+    # def tearDown(self):
+    #     """teardown all initialized variables."""
+    #     with self.app.app_context():
+    #         db.session.remove()
+    #         db.drop_all()
 
 
 if __name__ == "__main__":
