@@ -63,7 +63,7 @@ class User(db.Model):
         try:
             # set up a payload with an expiration time
             payload = {
-                'exp': datetime.utcnow() + timedelta(minutes=5),
+                'exp': datetime.utcnow() + timedelta(minutes=60),
                 'iat': datetime.utcnow(),
                 'sub': user_id
             }
@@ -188,30 +188,32 @@ class Menu(db.Model):
 
     # define the columns of the table, starting with its primary key
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.utcnow().date(), unique=True)
-    meals = relationship(
-                'Meal', secondary='menu_meals', backref=backref('menu_meals', lazy=True, uselist=True))
+    date = db.Column(db.DateTime, default=datetime.utcnow(), unique=True)
+    meal = db.Column(db.Integer)
     
     
 
 
-    def __init__(self, date=datetime.utcnow().date()):
+    def __init__(self, meal):
         """Initialize the order with a name and its creator."""
-        self.date = date
-        # self.meals = meals
+        # self.date = date
+        self.meal = meal
 
     
-    def add_meal_to_menu(self, meal):
-        '''Add meal to menu'''
-        today = datetime.utcnow().date()
-        if isinstance(meal, Meal):
-            setatrr(self, 'meals', meal)
-        # elif isinstance(meal, list):
-        #     setatrr(self, 'meals', meal)
-        else:
-            return False
-        # menu = Menu.query.filter_by(date=today).first()
-        
+    # def add_meal_to_menu(self, meal):
+    #     '''Add meal to menu'''
+    #     today = datetime.utcnow().date()
+    #     if isinstance(meal, Meal):
+    #         self.add('meals', [meal])
+    #     elif isinstance(meal, list):
+    #         self.add('meals', meal)
+    #     else:
+    #         return False
+    #     # menu = Menu.query.filter_by(date=today).first()
+    # def add(self, field, meal):
+    #     old = getatrr(self, field)
+    #     old.extend(meal)
+    #     self.save()
 
 
     def save(self):
