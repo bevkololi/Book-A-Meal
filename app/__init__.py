@@ -46,7 +46,7 @@ def create_app(config_name):
                     if price:
                         int(price)
                     else:
-                        {"message": "Price should be a number" 
+                        return {"message": "Price should be a number" 
                  }, 200
                     if name:
                         meal = Meal(name=name, description=description, price=price)
@@ -76,9 +76,11 @@ def create_app(config_name):
                     return make_response(jsonify(results)), 200
             else:
                 response = {
-                    'message': 'Please input access token'
+                    'message': 'Unauthorized'
                 }
                 return make_response(jsonify(response)), 401
+    
+        return jsonify({'message': 'Please input access token'})
 
     @app.route('/api/v1/meals/<int:id>', methods=['GET', 'PUT', 'DELETE'])
     def meals_manipulation(id, **kwargs):
@@ -129,10 +131,13 @@ def create_app(config_name):
             else:
                               
                 response = {
-                    'message': 'Please input access token'
+                    'message': 'Please login and input access token'
                 }
                 return make_response(jsonify(response)), 401
 
+        return jsonify({'message': 'Please input access token'})
+
+    
     @app.route('/api/v1/orders/', methods=['POST', 'GET'])
     def orders():
         auth_header = request.headers.get('Authorization')
@@ -178,6 +183,9 @@ def create_app(config_name):
                     'message': message
                 }
                 return make_response(jsonify(response)), 401
+
+        return jsonify({'message': 'Please input access token'})
+
 
     @app.route('/api/v1/orders/<int:id>', methods=['GET', 'PUT', 'DELETE'])
     def order_manipulation(id, **kwargs):
@@ -227,6 +235,8 @@ def create_app(config_name):
                     'message': message
                 }
                 return make_response(jsonify(response)), 401
+
+        return jsonify({'message': 'Please input access token'})
 
 
     
@@ -282,6 +292,8 @@ def create_app(config_name):
                 }
                 return make_response(jsonify(response)), 401
 
+        return jsonify({'message': 'Please input access token'})
+
     
     @app.route('/api/v1/promote/user/<int:id>', methods=['PUT'])
     def promote_user(id, **kwargs):
@@ -293,18 +305,13 @@ def create_app(config_name):
             if not isinstance(user_id, str):
                 user = User.query.filter_by(id=id).first()
                 if not user:
-                    abort(404)
-
-                
+                    abort(404)                
                 if request.method == "PUT":
                     user.caterer = True
-                    user.save()                   
-                
+                    user.save()              
 
                     if not user:
-                        return jsonify({'message' : 'No user found!'})
-
-                    
+                        return jsonify({'message' : 'No user found!'})                    
                     
                     return jsonify({'message' : 'The user has been promoted to caterer!'})
             else:
@@ -313,6 +320,8 @@ def create_app(config_name):
                     'message': message
                 }
                 return make_response(jsonify(response)), 401
+
+        return jsonify({'message': 'Please input access token'})
 
 
     # @app.route('/api/v1/menu/', methods=['POST', 'GET'])
@@ -324,53 +333,49 @@ def create_app(config_name):
     #         user_id = User.decode_token(access_token)
     #         if not isinstance(user_id, str):
     #             if request.method == "POST":
-    #                 meal = Meal(name='sqaunch', description='double squanch', price=50)
-    #                 meal.save() #str(request.data.get('meals'))
-    #                 # date = request.data.get('date', '')
-    #                 if meal:
-    #                     menu = Menu(meals=meal, date=datetime.utcnow().date())
-    #                     menu.add_meal_to_menu(meals)
+    #                 meal = Meal.query.filter_by(id=id).first()
+    #                 menu_meal = str(request.data.get('meal', ''))
+    #                 if meal == menu_meal:
+    #                     menu = Menu(meal=meal, date=date)
     #                     menu.save()
-    #                     response = {
+    #                     response = jsonify({
     #                         'id': menu.id,
+    #                         'meal': menu.meal,
     #                         'date': menu.date,
-    #                         'meals': menu.meals,                            
-    #                     }
-    #                 return make_response(jsonify(response)), 200
-                    
+                            
+    #                     })
+
+    #                     return jsonify({'message': 'Meal successfully added to menu'}), 201
+
+    #                 return jsonify({'message': 'Meal does not exist in meal list. Please add it first'}), 404
+
     #             else:
-    #                 today = datetime.utcnow().date()
-    #                 menu = Menu.query.filter_by(date=today).first()
+    #                 menu = Menu.get_all()
     #                 results = []
 
-    #                 if menu:
+    #                 for a_menu in menu:
     #                     obj = {
     #                         'id': menu.id,
+    #                         'meal': menu.meal,
     #                         'date': menu.date,
-    #                         'meals': menu.meals,
+                            
     #                     }
     #                     results.append(obj)
 
     #                 return make_response(jsonify(results)), 200
     #         else:
-    #             message = user_id
     #             response = {
-    #                 'message': message
+    #                 'message': 'Unauthorized'
     #             }
     #             return make_response(jsonify(response)), 401
-
-
-
-                    
-
-
-
-                    
     
+    #     return jsonify({'message': 'Please input access token'})
+
+
+
     
     from .auth import auth_blueprint
     app.register_blueprint(auth_blueprint)
     
-
 
     return app
