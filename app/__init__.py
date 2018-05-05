@@ -31,34 +31,41 @@ def create_app(config_name):
         return make_response(jsonify({'error': BAD_REQUEST}), 400)
 
 
+
+
     @app.route('/api/v1/meals/', methods=['POST', 'GET'])
     def meals():
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
+        
 
         if access_token:
             user_id = User.decode_token(access_token)
             if not isinstance(user_id, str):
                 if request.method == "POST":
-                    name = str(request.data.get('name', ''))
-                    description = str(request.data.get('description', ''))
-                    price = str(request.data.get('price', ''))
-                    if price:
-                        int(price)
-                    else:
-                        return {"message": "Price should be a number" 
-                 }, 200
-                    if name:
-                        meal = Meal(name=name, description=description, price=price)
-                        meal.save()
-                        response = jsonify({
-                            'id': meal.id,
-                            'name': meal.name,
-                            'description': meal.description,
-                            'price': meal.price
-                        })
+                    current_user = User.query.filter_by(id=user_id).first()
+                    if current_user.caterer:
+                        name = str(request.data.get('name', ''))
+                        description = str(request.data.get('description', ''))
+                        price = str(request.data.get('price', ''))
+                        if price:
+                            int(price)
+                        else:
+                            return {"message": "Price should be a number" 
+                     }, 200
+                        if name:
+                            meal = Meal(name=name, description=description, price=price)
+                            meal.save()
+                            response = jsonify({
+                                'id': meal.id,
+                                'name': meal.name,
+                                'description': meal.description,
+                                'price': meal.price
+                            })
 
-                        return make_response(response), 201
+                            return make_response(response), 201
+                    else:
+                        return jsonify({'message': 'You are unauthorized to access this'})
 
                 else:
                     meals = Meal.get_all()
@@ -75,12 +82,21 @@ def create_app(config_name):
 
                     return make_response(jsonify(results)), 200
             else:
+                # user is not legit, so the payload is an error message
+                message = user_id
                 response = {
-                    'message': 'Unauthorized'
+                    'message': message
                 }
                 return make_response(jsonify(response)), 401
+
+
+        else:
+            response = {
+                'message': 'Please input access token'
+            }
+            return make_response(jsonify(response)), 401
+
     
-        return jsonify({'message': 'Please input access token'})
 
     @app.route('/api/v1/meals/<int:id>', methods=['GET', 'PUT', 'DELETE'])
     def meals_manipulation(id, **kwargs):
@@ -91,51 +107,65 @@ def create_app(config_name):
         if access_token:
             user_id = User.decode_token(access_token)
             if not isinstance(user_id, str):
-                meal = Meal.query.filter_by(id=id).first()
-                if not meal:
-                    abort(404)
+                current_user = User.query.filter_by(id=user_id).first()
+                if current_user.caterer:
+                    meal = Meal.query.filter_by(id=id).first()
+                    if not meal:
+                        abort(404)
 
-                if request.method == "DELETE":
-                    meal.delete()
-                    return {
-                        "message": "meal {} deleted".format(meal.id)
-                    }, 200
-                elif request.method == 'PUT':
-                    name = str(request.data.get('name', ''))
-                    description = str(request.data.get('description', ''))
-                    price = str(request.data.get('price', ''))
-                    if price:
-                        int(price)
+                    if request.method == "DELETE":
+                        meal.delete()
+                        return {
+                            "message": "meal {} deleted".format(meal.id)
+                        }, 200
+                    elif request.method == 'PUT':
+                        name = str(request.data.get('name', ''))
+                        description = str(request.data.get('description', ''))
+                        price = str(request.data.get('price', ''))
+                        if price:
+                            int(price)
+                        else:
+                            {"message": "Price should be a number" 
+                     }, 200
+                        meal.name = name
+                        meal.description = description
+                        meal.price = price
+                        meal.save()
+                        response = {
+                            'id': meal.id,
+                            'name': meal.name,
+                            'description': meal.description,
+                            'price': meal.price
+                        }
+                        return make_response(jsonify(response)), 200
                     else:
-                        {"message": "Price should be a number" 
-                 }, 200
-                    meal.name = name
-                    meal.description = description
-                    meal.price = price
-                    meal.save()
-                    response = {
-                        'id': meal.id,
-                        'name': meal.name,
-                        'description': meal.description,
-                        'price': meal.price
-                    }
-                    return make_response(jsonify(response)), 200
+                        response = jsonify({
+                            'id': meal.id,
+                            'name': meal.name,
+                            'description': meal.description,
+                            'price': meal.price
+                        })
+                        return make_response(response), 200
                 else:
-                    response = jsonify({
-                        'id': meal.id,
-                        'name': meal.name,
-                        'description': meal.description,
-                        'price': meal.price
-                    })
-                    return make_response(response), 200
+                                  
+                    response = {
+                        'message': 'You are not authorized to perform these functions'
+                    }
+                    return make_response(jsonify(response)), 401
+
             else:
-                              
+                # user is not legit, so the payload is an error message
+                message = user_id
                 response = {
-                    'message': 'Please login and input access token'
+                    'message': message
                 }
                 return make_response(jsonify(response)), 401
 
-        return jsonify({'message': 'Please input access token'})
+        else:
+            response = {
+                'message': 'Please input access token'
+            }
+            return make_response(jsonify(response)), 401
 
     
     @app.route('/api/v1/myorders/', methods=['POST', 'GET'])
@@ -179,12 +209,19 @@ def create_app(config_name):
 
                     return make_response(jsonify(results)), 200
             else:
+                # user is not legit, so the payload is an error message
                 message = user_id
                 response = {
                     'message': message
                 }
                 return make_response(jsonify(response)), 401
-        # return jsonify({'message': 'Please input access token'})
+
+        else:
+            response = {
+                'message': 'Please input access token'
+            }
+            return make_response(jsonify(response)), 401
+
 
     @app.route('/api/v1/orders/', methods=['GET'])
     def adminorders():
@@ -194,25 +231,41 @@ def create_app(config_name):
         if access_token:
             user_id = User.decode_token(access_token)
             if not isinstance(user_id, str):
-                orders = Order.get_all(user_id=User.id)
-                results = []
-                
-                for order in orders:
-                        obj = {
-                            'id': order.id,
-                            'meal': order.meal,
-                            'time_ordered': order.time_ordered,
-                            'quantity': order.quantity,
-                            'ordered_by': order.ordered_by
-                     }
-                        results.append(obj)
-                        
+                current_user = User.query.filter_by(id=user_id).first()
+                if current_user.caterer:
+                    orders = Order.get_all(user_id=User.id)
+                    results = []
+                    
+                    for order in orders:
+                            obj = {
+                                'id': order.id,
+                                'meal': order.meal,
+                                'time_ordered': order.time_ordered,
+                                'quantity': order.quantity,
+                                'ordered_by': order.ordered_by
+                         }
+                            results.append(obj)
+                            
 
-                return make_response(jsonify(results)), 200
+                    return make_response(jsonify(results)), 200
+                
+                else:
+                                  
+                    response = {
+                        'message': 'You are not authorized to perform these functions'
+                    }
+                    return make_response(jsonify(response)), 401
+            else:
+                # user is not legit, so the payload is an error message
+                message = user_id
+                response = {
+                    'message': message
+                }
+                return make_response(jsonify(response)), 401
+
         else:
-            message = user_id
             response = {
-                'message': message
+                'message': 'Please input access token'
             }
             return make_response(jsonify(response)), 401
 
@@ -227,47 +280,60 @@ def create_app(config_name):
         if access_token:
             user_id = User.decode_token(access_token)
             if not isinstance(user_id, str):
-                order = Order.query.filter_by(id=id).first()
-                if not order:
-                    abort(404)
+                current_user = User.query.filter_by(id=user_id).first()
+                if current_user.caterer:
+                    order = Order.query.filter_by(id=id).first()
+                    if not order:
+                        abort(404)
 
-                if request.method == "DELETE":
-                    order.delete()
-                    return {
-                        "message": "order {} deleted".format(order.id)
-                    }, 200
-                elif request.method == 'PUT':
-                    meal = str(request.data.get('meal', ''))
-                    quantity = str(request.data.get('quantity', ''))
-                    order.meal = meal
-                    order.quantity = quantity
-                    order.save()
-                    response = {
-                        'id': order.id,
-                        'meal': order.meal,
-                        'time_ordered': order.time_ordered,
-                        'quantity': order.quantity,
-                        'ordered_by': user_id
-                    }
-                    return make_response(jsonify(response)), 200
+                    if request.method == "DELETE":
+                        order.delete()
+                        return {
+                            "message": "order {} deleted".format(order.id)
+                        }, 200
+                    elif request.method == 'PUT':
+                        meal = str(request.data.get('meal', ''))
+                        quantity = str(request.data.get('quantity', ''))
+                        order.meal = meal
+                        order.quantity = quantity
+                        order.save()
+                        response = {
+                            'id': order.id,
+                            'meal': order.meal,
+                            'time_ordered': order.time_ordered,
+                            'quantity': order.quantity,
+                            'ordered_by': user_id
+                        }
+                        return make_response(jsonify(response)), 200
+                    else:
+                        # GET
+                        response = jsonify({
+                            'id': order.id,
+                            'meal': order.meal,
+                            'time_ordered': order.time_ordered,
+                            'quantity': order.quantity,
+                            'ordered_by': user_id
+                    })
+                        return make_response(response), 200
                 else:
-                    # GET
-                    response = jsonify({
-                        'id': order.id,
-                        'meal': order.meal,
-                        'time_ordered': order.time_ordered,
-                        'quantity': order.quantity,
-                        'ordered_by': user_id
-                })
-                    return make_response(response), 200
+                                  
+                    response = {
+                        'message': 'You are not authorized to perform these functions'
+                    }
+                    return make_response(jsonify(response)), 401
             else:
+                # user is not legit, so the payload is an error message
                 message = user_id
                 response = {
                     'message': message
                 }
                 return make_response(jsonify(response)), 401
 
-        return jsonify({'message': 'Please input access token'})
+        else:
+            response = {
+                'message': 'Please input access token'
+            }
+            return make_response(jsonify(response)), 401
 
 
     
@@ -282,49 +348,63 @@ def create_app(config_name):
         if access_token:
             user_id = User.decode_token(access_token)
             if not isinstance(user_id, str):
-                user = User.query.filter_by(id=id).first()
-                if not user:
-                    abort(404)
+                current_user = User.query.filter_by(id=user_id).first()
+                if current_user.caterer:
+                    user = User.query.filter_by(id=id).first()
+                    if not user:
+                        abort(404)
 
-                if request.method == "DELETE":
-                    user.delete()
-                    return {
-                        "message": "user {} has been deleted".format(user.id)
-                    }, 200
-                elif request.method == 'PUT':
-                    username = str(request.data.get('user', ''))
-                    email = str(request.data.get('email', ''))
-                    password = str(request.data.get('password', ''))
-                    
-                    user.username = username
-                    user.email = email
-                    user.password = password
-                    user.save()
-                    response = {
-                        'id': user.id,
-                        'username': meal.username,
-                        'email': user.email,
-                        'password': user.password,
-                        'caterer': user.caterer
-                    }
-                    return make_response(jsonify(response)), 200
+                    if request.method == "DELETE":
+                        user.delete()
+                        return {
+                            "message": "user {} has been deleted".format(user.id)
+                        }, 200
+                    elif request.method == 'PUT':
+                        username = str(request.data.get('user', ''))
+                        email = str(request.data.get('email', ''))
+                        password = str(request.data.get('password', ''))
+                        
+                        user.username = username
+                        user.email = email
+                        user.password = password
+                        user.save()
+                        response = {
+                            'id': user.id,
+                            'username': meal.username,
+                            'email': user.email,
+                            'password': user.password,
+                            'caterer': user.caterer
+                        }
+                        return make_response(jsonify(response)), 200
+                    else:
+                        response = jsonify({
+                            'id': user.id,
+                            'username': user.username,
+                            'email': user.email,
+                            'password': user.password,
+                            'caterer': user.caterer
+                        })
+                        return make_response(response), 200
                 else:
-                    response = jsonify({
-                        'id': user.id,
-                        'username': user.username,
-                        'email': user.email,
-                        'password': user.password,
-                        'caterer': user.caterer
-                    })
-                    return make_response(response), 200
+                                  
+                    response = {
+                        'message': 'You are not authorized to perform these functions'
+                    }
+                    return make_response(jsonify(response)), 401
+
             else:
-                              
+                # user is not legit, so the payload is an error message
+                message = user_id
                 response = {
-                    'message': 'Please input access token'
+                    'message': message
                 }
                 return make_response(jsonify(response)), 401
 
-        return jsonify({'message': 'Please input access token'})
+        else:
+            response = {
+                'message': 'Please input access token'
+            }
+            return make_response(jsonify(response)), 401
 
     
     @app.route('/api/v1/promote/user/<int:id>', methods=['PUT'])
@@ -335,25 +415,38 @@ def create_app(config_name):
         if access_token:
             user_id = User.decode_token(access_token)
             if not isinstance(user_id, str):
-                user = User.query.filter_by(id=id).first()
-                if not user:
-                    abort(404)                
-                if request.method == "PUT":
-                    user.caterer = True
-                    user.save()              
-
+                current_user = User.query.filter_by(id=user_id).first()
+                if current_user.caterer:
+                    user = User.query.filter_by(id=id).first()
                     if not user:
-                        return jsonify({'message' : 'No user found!'})                    
+                            return jsonify({'message' : 'No user found!'})                 
                     
-                    return jsonify({'message' : 'The user has been promoted to caterer!'})
+                    if request.method == "PUT":
+                        user.caterer = True
+                        user.save()              
+
+                                          
+                        
+                        return jsonify({'message' : 'The user has been promoted to caterer!'})
+                else:
+                                  
+                    response = {
+                        'message': 'You are not authorized to perform these functions'
+                    }
+                    return make_response(jsonify(response)), 401
             else:
+                # user is not legit, so the payload is an error message
                 message = user_id
                 response = {
                     'message': message
                 }
                 return make_response(jsonify(response)), 401
 
-        return jsonify({'message': 'Please input access token'})
+        else:
+            response = {
+                'message': 'Please input access token'
+            }
+            return make_response(jsonify(response)), 401
 
 
     @app.route('/api/v1/menu/', methods=['POST', 'GET'])
@@ -364,24 +457,32 @@ def create_app(config_name):
         if access_token:
             user_id = User.decode_token(access_token)
             if not isinstance(user_id, str):
+                current_user = User.query.filter_by(id=user_id).first()
                 if request.method == "POST":
-                    try:
-                        menu_meals = str(request.data.get('meal_list', ''))
-                        date = str(request.data.get('date', ''))
-                        # date = json_data.get('date')
-                        if date == '':
-                            date = datetime.utcnow().date()
-                        if menu_meals:
-                            meals = [Meal.get(id=id) for id in menu_meals]
-                            menu = Menu(date=date)
-                            menu.add_meal_to_menu(meals) 
-                            return {'message': 'Todays me nu has been updated'}, 201
-                        return {'message': 'Please add menu items'}, 202
-                    except Exception as error:
-                        return {
-                            'message': 'an error occured',
-                            'Error': str(error)
-                        }       , 400
+                    if current_user.caterer:
+                        try:
+                            menu_meals = str(request.data.get('meal_list', ''))
+                            date = str(request.data.get('date', ''))
+                            # date = json_data.get('date')
+                            if date == '':
+                                date = datetime.utcnow().date()
+                            if menu_meals:
+                                meals = [Meal.get(id=id) for id in menu_meals]
+                                menu = Menu(date=date)
+                                menu.add_meal_to_menu(meals) 
+                                return {'message': 'Todays menu has been updated'}, 201
+                            return {'message': 'Please add menu items'}, 202
+                        except Exception as error:
+                            return {
+                                'message': 'an error occured',
+                                'Error': str(error)
+                            }       , 400
+                    else:
+                              
+                        response = {
+                            'message': 'You are not authorized to perform these functions'
+                        }
+                        return make_response(jsonify(response)), 401
 
                 else:
                     try:
@@ -395,7 +496,20 @@ def create_app(config_name):
                         return {
                             'message': 'an error occured',
                             'Error': str(error)
-            }, 400       
+                }, 400  
+            else:
+                # user is not legit, so the payload is an error message
+                message = user_id
+                response = {
+                    'message': message
+                }
+                return make_response(jsonify(response)), 401 
+
+        else:
+            response = {
+                'message': 'Please input access token'
+            }
+            return make_response(jsonify(response)), 401    
 
 
 
