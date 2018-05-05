@@ -64,6 +64,10 @@ def create_app(config_name):
                             })
 
                             return make_response(response), 201
+
+                        else:
+                            return jsonify({'message': 'Please input the name of the meal'})
+                    
                     else:
                         return jsonify({'message': 'You are unauthorized to access this'})
 
@@ -180,6 +184,11 @@ def create_app(config_name):
                     meal = str(request.data.get('meal', ''))
                     quantity = str(request.data.get('quantity', ''))
                     ordered_by = Order.ordered_by
+                    if quantity:
+                            int(quantity)
+                    else:
+                        return {"message": "Quantity should be a number" 
+                 }, 200
                     if meal:
                         order = Order(meal=meal, quantity=quantity, ordered_by=user_id)
                         order.save()
@@ -192,6 +201,8 @@ def create_app(config_name):
                         })
 
                         return make_response(response), 201
+                    else:
+                        return jsonify({'message': 'Please input the meal name and quantity'})
 
                 else:
                     orders = Order.get_all(user_id)
