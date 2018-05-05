@@ -513,46 +513,6 @@ def create_app(config_name):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-        #                 return jsonify({'message': 'Meal successfully added to menu'}), 201
-
-        #             return jsonify({'message': 'Meal does not exist in meal list. Please add it first'}), 404
-
-        #         else:
-        #             menu = Menu.get_all()
-        #             results = []
-
-        #             for a_menu in menu:
-        #                 obj = {
-        #                     'id': menu.id,
-        #                     'meal': menu.meal,
-        #                     'date': menu.date,
-                            
-        #                 }
-        #                 results.append(obj)
-
-        #             return make_response(jsonify(results)), 200
-        #     else:
-        #         response = {
-        #             'message': 'Unauthorized'
-        #         }
-        #         return make_response(jsonify(response)), 401
-    
-        # return jsonify({'message': 'Please input access token'})
-
-
-
     
     from .auth import auth_blueprint
     app.register_blueprint(auth_blueprint)
