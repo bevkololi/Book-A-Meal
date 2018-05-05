@@ -63,7 +63,7 @@ class User(db.Model):
         try:
             # set up a payload with an expiration time
             payload = {
-                'exp': datetime.utcnow() + timedelta(minutes=60),
+                'exp': datetime.utcnow() + timedelta(minutes=3600),
                 'iat': datetime.utcnow(),
                 'sub': user_id
             }
@@ -224,7 +224,6 @@ class Menu(db.Model):
             setattr(self, key, value)
             self.save()
 
-    
     def add_meal_to_menu(self, meal, date=None):
         '''Add meal to menu'''
         if not date:
