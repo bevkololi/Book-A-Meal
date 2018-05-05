@@ -130,9 +130,29 @@ class Meal(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    def add_to_menu(self):
+        '''method to add meal to todays menu'''
+        Menu.add_meal(self)
+
     def __repr__(self):
         """Return a representation of a meal instance."""
         return "<Meal: {}>".format(self.meal)
+
+    @classmethod
+    def has(cls,**kwargs):
+        obj = cls.query.filter_by(**kwargs).first()
+        if obj:
+            return True
+        return False
+
+    @classmethod
+    def get(cls, **kwargs):
+        return cls.query.filter_by(**kwargs).first()
+
+    def make_dict(self):
+        '''serialize class'''
+        return {col.name: getattr(self, col.name) for col in self.__table__.columns}
+
 
 
 class Order(db.Model):
@@ -146,12 +166,18 @@ class Order(db.Model):
     quantity = db.Column(db.Integer())
     time_ordered = db.Column(db.DateTime, default=db.func.current_timestamp())
     ordered_by = db.Column(db.Integer, db.ForeignKey(User.id))
+    
 
     def __init__(self, meal, quantity, ordered_by):
         """Initialize the order with a name and its creator."""
         self.meal = meal
         self.ordered_by = ordered_by
         self.quantity = quantity
+
+    def add_meal_to_order(self, meal, quantity=1):
+        assoc = MealAssoc(quantity=quantity)
+        assoc.meal = meal
+        self.meal.append(assoc)
 
     def save(self):
         """Save an order.
@@ -166,71 +192,63 @@ class Order(db.Model):
         """This method gets all the orders for a given user."""
         return Order.query.filter_by(ordered_by=user_id)
 
-    @staticmethod
-    def get_all():
-        """This method gets all the orders for a given user."""
-        return Order.query.all()
-
+    
     def delete(self):
         """Deletes a given order."""
         db.session.delete(self)
         db.session.commit()
 
+    
     def __repr__(self):
         """Return a representation of a order instance."""
         return "<Order: {}>".format(self.meal)
 
 
-class Menu(db.Model):
-    """This class defines the order table."""
 
+class Menu(db.Model):
+    '''model for Menus'''
     __tablename__ = 'menu'
 
-    # define the columns of the table, starting with its primary key
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.utcnow(), unique=True)
-    meal = db.Column(db.Integer)
+    date = db.Column(db.DateTime, default=datetime.utcnow().date(), unique=True)
+    meals = relationship(
+        'Meal', secondary='menu_meals', backref=backref('menu_meals', lazy=True, uselist=True))
+
+        
+    def add(self, key, value):
+        if isinstance(value, list):
+            old_value = getattr(self, key)
+            old_value.extend(value)
+            self.save()
+        else:
+            setattr(self, key, value)
+            self.save()
+
     
+    def add_meal_to_menu(self, meal, date=None):
+        '''Add meal to menu'''
+        if not date:
+            date = datetime.utcnow().date()
+        menu = Menu.query.filter_by(date=date).first()
+        if not menu:
+            menu = Menu()
+        if isinstance(meal, Meal):
+            meal = [meal]
+        self.add('meals', meal)
     
-
-
-    def __init__(self, meal):
-        """Initialize the order with a name and its creator."""
-        # self.date = date
-        self.meal = meal
-
-    
-    # def add_meal_to_menu(self, meal):
-    #     '''Add meal to menu'''
-    #     today = datetime.utcnow().date()
-    #     if isinstance(meal, Meal):
-    #         self.add('meals', [meal])
-    #     elif isinstance(meal, list):
-    #         self.add('meals', meal)
-    #     else:
-    #         return False
-    #     # menu = Menu.query.filter_by(date=today).first()
-    # def add(self, field, meal):
-    #     old = getatrr(self, field)
-    #     old.extend(meal)
-    #     self.save()
-
 
     def save(self):
-        """Save a menu.
-        This applies for both creating a new order
-        and updating an existing onupdate
+        """Save a meal.
+        This applies for both creating a new meal
+        and updating an existing meal
         """
         db.session.add(self)
         db.session.commit()
 
-    
-
-    def delete(self):
-        """Deletes a given bucketlist."""
-        db.session.delete(self)
-        db.session.commit()
+    @classmethod
+    def get(cls, **kwargs):
+        return cls.query.filter_by(**kwargs).first()
 
     def __repr__(self):
-        """Return a representation of an order instance."""
-        return '<Menu Date {}>'.format(self.date.ctime())
+        '''class instance rep'''
+        return '<Menu {}>'.format(self.menu())
