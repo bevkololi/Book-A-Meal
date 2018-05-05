@@ -138,7 +138,7 @@ def create_app(config_name):
         return jsonify({'message': 'Please input access token'})
 
     
-    @app.route('/api/v1/orders/', methods=['POST', 'GET'])
+    @app.route('/api/v1/myorders/', methods=['POST', 'GET'])
     def orders():
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
@@ -149,6 +149,7 @@ def create_app(config_name):
                 if request.method == "POST":
                     meal = str(request.data.get('meal', ''))
                     quantity = str(request.data.get('quantity', ''))
+                    ordered_by = Order.ordered_by
                     if meal:
                         order = Order(meal=meal, quantity=quantity, ordered_by=user_id)
                         order.save()
@@ -163,7 +164,7 @@ def create_app(config_name):
                         return make_response(response), 201
 
                 else:
-                    orders = Order.get_all()
+                    orders = Order.get_all(user_id)
                     results = []
 
                     for order in orders:
@@ -172,7 +173,7 @@ def create_app(config_name):
                             'meal': order.meal,
                             'time_ordered': order.time_ordered,
                             'quantity': order.quantity,
-                            'ordered_by': user_id
+                            'ordered_by': order.ordered_by
                         }
                         results.append(obj)
 
@@ -183,8 +184,38 @@ def create_app(config_name):
                     'message': message
                 }
                 return make_response(jsonify(response)), 401
+        # return jsonify({'message': 'Please input access token'})
 
-        return jsonify({'message': 'Please input access token'})
+    @app.route('/api/v1/orders/', methods=['GET'])
+    def adminorders():
+        auth_header = request.headers.get('Authorization')
+        access_token = auth_header.split(" ")[1]
+
+        if access_token:
+            user_id = User.decode_token(access_token)
+            if not isinstance(user_id, str):
+                orders = Order.get_all(user_id=User.id)
+                results = []
+                
+                for order in orders:
+                        obj = {
+                            'id': order.id,
+                            'meal': order.meal,
+                            'time_ordered': order.time_ordered,
+                            'quantity': order.quantity,
+                            'ordered_by': order.ordered_by
+                     }
+                        results.append(obj)
+                        
+
+                return make_response(jsonify(results)), 200
+        else:
+            message = user_id
+            response = {
+                'message': message
+            }
+            return make_response(jsonify(response)), 401
+
 
 
     @app.route('/api/v1/orders/<int:id>', methods=['GET', 'PUT', 'DELETE'])
@@ -239,6 +270,7 @@ def create_app(config_name):
         return jsonify({'message': 'Please input access token'})
 
 
+    
     
 
     @app.route('/api/v1/users/<int:id>', methods=['GET', 'PUT', 'DELETE'])
@@ -324,52 +356,86 @@ def create_app(config_name):
         return jsonify({'message': 'Please input access token'})
 
 
-    # @app.route('/api/v1/menu/', methods=['POST', 'GET'])
-    # def menu():
-    #     auth_header = request.headers.get('Authorization')
-    #     access_token = auth_header.split(" ")[1]
+    @app.route('/api/v1/menu/', methods=['POST', 'GET'])
+    def menu():
+        auth_header = request.headers.get('Authorization')
+        access_token = auth_header.split(" ")[1]
 
-    #     if access_token:
-    #         user_id = User.decode_token(access_token)
-    #         if not isinstance(user_id, str):
-    #             if request.method == "POST":
-    #                 meal = Meal.query.filter_by(id=id).first()
-    #                 menu_meal = str(request.data.get('meal', ''))
-    #                 if meal == menu_meal:
-    #                     menu = Menu(meal=meal, date=date)
-    #                     menu.save()
-    #                     response = jsonify({
-    #                         'id': menu.id,
-    #                         'meal': menu.meal,
-    #                         'date': menu.date,
+        if access_token:
+            user_id = User.decode_token(access_token)
+            if not isinstance(user_id, str):
+                if request.method == "POST":
+                    try:
+                        menu_meals = str(request.data.get('meal_list', ''))
+                        date = str(request.data.get('date', ''))
+                        # date = json_data.get('date')
+                        if date == '':
+                            date = datetime.utcnow().date()
+                        if menu_meals:
+                            meals = [Meal.get(id=id) for id in menu_meals]
+                            menu = Menu(date=date)
+                            menu.add_meal_to_menu(meals) 
+                            return {'message': 'Todays me nu has been updated'}, 201
+                        return {'message': 'Please add menu items'}, 202
+                    except Exception as error:
+                        return {
+                            'message': 'an error occured',
+                            'Error': str(error)
+                        }       , 400
+
+                else:
+                    try:
+                        menu_meals = Menu.get(date=datetime.utcnow().date())
+                        menu_meals = [item.make_dict() for item in menu_meals.meals]
+                        return {
+                            'message': 'Here is the menu for today',
+                            'menu': menu_meals
+                        }, 200
+                    except Exception as error:
+                        return {
+                            'message': 'an error occured',
+                            'Error': str(error)
+            }, 400       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        #                 return jsonify({'message': 'Meal successfully added to menu'}), 201
+
+        #             return jsonify({'message': 'Meal does not exist in meal list. Please add it first'}), 404
+
+        #         else:
+        #             menu = Menu.get_all()
+        #             results = []
+
+        #             for a_menu in menu:
+        #                 obj = {
+        #                     'id': menu.id,
+        #                     'meal': menu.meal,
+        #                     'date': menu.date,
                             
-    #                     })
+        #                 }
+        #                 results.append(obj)
 
-    #                     return jsonify({'message': 'Meal successfully added to menu'}), 201
-
-    #                 return jsonify({'message': 'Meal does not exist in meal list. Please add it first'}), 404
-
-    #             else:
-    #                 menu = Menu.get_all()
-    #                 results = []
-
-    #                 for a_menu in menu:
-    #                     obj = {
-    #                         'id': menu.id,
-    #                         'meal': menu.meal,
-    #                         'date': menu.date,
-                            
-    #                     }
-    #                     results.append(obj)
-
-    #                 return make_response(jsonify(results)), 200
-    #         else:
-    #             response = {
-    #                 'message': 'Unauthorized'
-    #             }
-    #             return make_response(jsonify(response)), 401
+        #             return make_response(jsonify(results)), 200
+        #     else:
+        #         response = {
+        #             'message': 'Unauthorized'
+        #         }
+        #         return make_response(jsonify(response)), 401
     
-    #     return jsonify({'message': 'Please input access token'})
+        # return jsonify({'message': 'Please input access token'})
 
 
 
