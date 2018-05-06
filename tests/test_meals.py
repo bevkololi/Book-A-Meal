@@ -30,6 +30,8 @@ class MealTestCase(unittest.TestCase):
         return self.client().post('/auth/signup', data=user_data)
 
     def login_user(self, username= 'Some user', email="user@gmail.com", password="pass1234"):
+        user = User(username=username, email=email, password=password)
+        user.save()
         user_data = {
             'username': username,
             'email': email,
@@ -51,7 +53,7 @@ class MealTestCase(unittest.TestCase):
 
     def test_non_admin_cannot_create_meals(self):
         """Test that a non-caterer cannot create a meal (POST request)"""
-        self.register_user()
+        # self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
         res = self.client().post('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token), data=self.meal)
@@ -74,7 +76,7 @@ class MealTestCase(unittest.TestCase):
 
     def test_non_admin_cannot_get_meals(self):
         """Test non-caterer cannot get mealss (GET request)."""
-        self.register_user()
+        # self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
         res = self.client().post('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token), data=self.meal)
@@ -95,7 +97,7 @@ class MealTestCase(unittest.TestCase):
 
     def test_non_admin_cannot_manpulate_meal(self):
         """Test non-caterer cannot get a single meal by using it's id."""
-        self.register_user()
+        # self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
         rv = self.client().post('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token), data=self.meal)
@@ -124,7 +126,7 @@ class MealTestCase(unittest.TestCase):
 
     def test_non_admin_cannot_edit_meals(self):
         """Test non-admin cannot edit an existing meal. (PUT request)"""
-        self.register_user()
+        # self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
         rv = self.client().post(
@@ -160,7 +162,7 @@ class MealTestCase(unittest.TestCase):
 
     def test_no_admin_canoot_delete_meal(self):
         """Test non-caterer cannot delete an existing meal. (DELETE request)."""
-        self.register_user()
+        # self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
         rv = self.client().post(
