@@ -1,5 +1,0 @@
-[
-  "test_menu.py::MenuTestCase::test_admin_can_creates_menu",
-  "test_menu.py::MenuTestCase::test_non_admin_cannot_create_menu",
-  "test_menu.py::MenuTestCase::test_user_can_access_menu"
-]
