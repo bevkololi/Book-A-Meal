@@ -1,5 +1,6 @@
 import unittest
 import os
+from datetime import datetime
 import json
 from . import create_app, db
 from . import User, Menu, Meal
@@ -77,7 +78,8 @@ class MenuTestCase(unittest.TestCase):
 
     def test_user_can_access_menu(self):
         """Test user can access the menu (GET request)."""
-        menu = Menu()
+        date = datetime.utcnow().date()
+        menu = Menu(date=date)
         meal = Meal(name='Beef', description='Saucy beef', price=10)
         meal.save()
         menu.add_meal_to_menu(meal)
