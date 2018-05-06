@@ -18,7 +18,6 @@ class MealTestCase(unittest.TestCase):
 
         
         with self.app.app_context():
-            #create all tables
             db.session.close()
             db.drop_all()
             db.create_all()
@@ -52,6 +51,7 @@ class MealTestCase(unittest.TestCase):
         return self.client().post('/auth/login', data=user_data)
 
     def test_non_admin_cannot_create_meals(self):
+        """Test that a non-caterer cannot create a meal (POST request)"""
         self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
@@ -62,7 +62,7 @@ class MealTestCase(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_admin_can_creates_meals(self):
-        """Test API can create a meal (POST request)"""
+        """Test caterer can create a meal (POST request)"""
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
@@ -74,7 +74,7 @@ class MealTestCase(unittest.TestCase):
         
 
     def test_non_admin_cannot_get_meals(self):
-        """Test API can get a meal (GET request)."""
+        """Test non-caterer cannot get mealss (GET request)."""
         self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
@@ -85,7 +85,7 @@ class MealTestCase(unittest.TestCase):
         
 
     def test_admin_can_get_meals(self):
-        """Test API can get a meal (GET request)."""
+        """Test caterer can get a meal (GET request)."""
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
@@ -95,7 +95,7 @@ class MealTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
 
     def test_non_admin_cannot_manpulate_meal(self):
-        """Test API can get a single meal by using it's id."""
+        """Test non-caterer cannot get a single meal by using it's id."""
         self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
@@ -109,7 +109,7 @@ class MealTestCase(unittest.TestCase):
         self.assertEqual(result.status_code, 401)
 
     def test_admin_can_manpulate_meal(self):
-        """Test API can get a single meal by using it's id."""
+        """Test caterer can get a single meal by using it's id."""
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
@@ -124,7 +124,7 @@ class MealTestCase(unittest.TestCase):
         
 
     def test_non_admin_cannot_edit_meals(self):
-        """Test API can edit an existing meal. (PUT request)"""
+        """Test non-admin cannot edit an existing meal. (PUT request)"""
         self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
@@ -142,7 +142,7 @@ class MealTestCase(unittest.TestCase):
 
 
     def test_admin_can_edit_meals(self):
-        """Test API can edit an existing meal. (PUT request)"""
+        """Test admin can edit an existing meal. (PUT request)"""
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
@@ -160,7 +160,7 @@ class MealTestCase(unittest.TestCase):
         
 
     def test_no_admin_canoot_delete_meal(self):
-        """Test API can delete an existing meal. (DELETE request)."""
+        """Test non-caterer cannot delete an existing meal. (DELETE request)."""
         self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
@@ -174,7 +174,7 @@ class MealTestCase(unittest.TestCase):
         self.assertEqual(result.status_code, 401)
 
     def test_admin_can_delete_meal(self):
-        """Test API can delete an existing meal. (DELETE request)."""
+        """Test caterer can delete an existing meal. (DELETE request)."""
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
@@ -190,7 +190,6 @@ class MealTestCase(unittest.TestCase):
     def tearDown(self):
         """teardown all initialized variables."""
         with self.app.app_context():
-            ##drop all tables
             db.session.remove()
             db.drop_all()
 

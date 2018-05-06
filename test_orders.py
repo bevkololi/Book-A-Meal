@@ -52,7 +52,7 @@ class OrderTestCase(unittest.TestCase):
         return self.client().post('/auth/login', data=user_data)
 
     def test_non_admin_can_create_order(self):
-        """Test API can create an order (POST request)"""
+        """Test user can create an order (POST request)"""
         self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
@@ -61,7 +61,7 @@ class OrderTestCase(unittest.TestCase):
         self.assertIn('Ugali', str(res.data))
 
     def test_user_can_see_their_orders(self):
-        """Test API can get an order (GET request)."""
+        """Test user can get their order history (GET request)."""
         self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
@@ -72,7 +72,7 @@ class OrderTestCase(unittest.TestCase):
         self.assertIn('Ugali', str(res.data))
 
     def test_admin_can_get_orders(self):
-        """Test API can get a meal (GET request)."""
+        """Test admin can get all orders (GET request)."""
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
@@ -80,7 +80,7 @@ class OrderTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
 
     def test_admin_can_manpulate_order(self):
-        """Test API can get a single meal by using it's id."""
+        """Test admin can get a single order by using it's id."""
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
@@ -94,7 +94,7 @@ class OrderTestCase(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
 
     def test_non_admin_cannot_manpulate_order(self):
-        """Test API can get a single meal by using it's id."""
+        """Test non_caterer cannot get a single meal by using it's id."""
         self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
@@ -109,7 +109,7 @@ class OrderTestCase(unittest.TestCase):
         
 
     def test_order_can_be_edited(self):
-        """Test API can edit an existing order. (PUT request)"""
+        """Test caterer can edit an existing order. (PUT request)"""
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
@@ -127,7 +127,7 @@ class OrderTestCase(unittest.TestCase):
         self.assertIn('stewed meat', str(results.data))
 
     def test_order_deletion_by_admin(self):
-        """Test API can delete an existing order. (DELETE request)."""
+        """Test caterer can delete an existing order. (DELETE request)."""
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
@@ -141,7 +141,7 @@ class OrderTestCase(unittest.TestCase):
         self.assertEqual(result.status_code, 404)
 
     def test_non_admin_cannot_delete_order(self):
-        """Test API can delete an existing order. (DELETE request)."""
+        """Test non_caterer cannot delete an existing order. (DELETE request)."""
         self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']

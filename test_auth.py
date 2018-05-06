@@ -59,12 +59,6 @@ class AuthTestCase(unittest.TestCase):
         self.assertEqual(
             result['message'], "Invalid email or password, Please try again")
 
-    # def tearDown(self):
-    #     """teardown all initialized variables."""
-    #     with self.app.app_context():
-    #         # db.session.remove()
-    #         db.drop_all()
-
 
 
 if __name__ == "__main__":

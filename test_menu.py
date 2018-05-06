@@ -14,8 +14,9 @@ class MenuTestCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         self.client = self.app.test_client
-        self.menu = [{'name': 'Ugali and sukuma wiki', 'description': 'This is ugali description', 'price': 20}]
-
+        # meal1.save()
+        # meal2.save()
+        self.menu = {'meal_list': [1]}
         
         with self.app.app_context():
             #create all tables
@@ -52,6 +53,7 @@ class MenuTestCase(unittest.TestCase):
         return self.client().post('/auth/login', data=user_data)
 
     def test_non_admin_cannot_create_menu(self):
+        """Test non-caterer cannot create a menu (POST request)"""
         self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
@@ -62,25 +64,28 @@ class MenuTestCase(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_admin_can_creates_menu(self):
-        """Test API can create a meal (POST request)"""
+        """Test admin can create a meal (POST request)"""
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
-        res = self.client().post('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token), data=self.menu)
-        expected = 'Todays menu has been updated'
+        res = self.client().post('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token), data=self.menu)
+        expected = "Todays menu has been updated"
         result = json.loads(res.data.decode('utf-8'))['message']
         self.assertEqual(res.status_code, 201)
         self.assertEqual(result, expected)
         
 
-    def test_authorized user_can_get_menu(self):
-        """Test API can get a meal (GET request)."""
-        self.register_user()
-        result = self.login_user()
+    def test_user_can_access_menu(self):
+        """Test user can access the menu (GET request)."""
+        result = self.login_admin()
         access_token = json.loads(result.data.decode())['access_token']
-        res = self.client().post('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token), data=self.menu)
-        self.assertEqual(res.status_code, 401)
-        res = self.client().get('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token))
+        res = self.client().post('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token), data=self.menu)
+        self.assertEqual(res.status_code, 201)
+        # self.register_user()
+        result = self.login_user()
+        self.assertEqual(200, result.status_code)
+        access_token = json.loads(result.data.decode())['access_token']
+        res = self.client().get('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 200)
         
 
