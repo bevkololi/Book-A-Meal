@@ -528,8 +528,8 @@ def create_app(config_name):
 
                 else:
                 
-                    menu_meals = Menu.get(date=datetime.utcnow().date())
-                    menu_meals = [item.make_dict() for item in menu_meals.meals]
+                    menu = Menu.query.order_by('menu.date').all()[-1]
+                    menu_meals = [item.make_dict() for item in menu.meals]
                     return {
                         'message': 'Here is the menu for today',
                         'menu': menu_meals
