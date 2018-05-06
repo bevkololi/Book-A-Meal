@@ -44,8 +44,13 @@ class User(db.Model):
         """Save a user to the database.
         This includes creating a new user and editing one.
         """
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as error:
+            return {        'message': 'an error occured',
+                            'Error': str(error)
+                }, 400 
 
     @staticmethod
     def get_all():
@@ -117,8 +122,13 @@ class Meal(db.Model):
         This applies for both creating a new meal
         and updating an existing meal
         """
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as error:
+            return {        'message': 'an error occured',
+                            'Error': str(error)
+                }, 400 
 
     @staticmethod
     def get_all():
@@ -184,8 +194,13 @@ class Order(db.Model):
         This applies for both creating a new order
         and updating an existing update
         """
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as error:
+            return {        'message': 'an error occured',
+                            'Error': str(error)
+                }, 400 
 
     @staticmethod
     def get_all(user_id):
@@ -233,16 +248,22 @@ class Menu(db.Model):
             menu = Menu()
         if isinstance(meal, Meal):
             meal = [meal]
-        self.add('meals', meal)
+        self.meals.extend(meal)
+        self.save()
     
 
     def save(self):
-        """Save a meal.
-        This applies for both creating a new meal
-        and updating an existing meal
+        """Save a menu.
+        This applies for both creating a new menu
+        and updating an existing menu
         """
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as error:
+            return {        'message': 'an error occured',
+                            'Error': str(error)
+                }, 400 
 
     @classmethod
     def get(cls, **kwargs):
@@ -250,4 +271,4 @@ class Menu(db.Model):
 
     def __repr__(self):
         '''class instance rep'''
-        return '<Menu {}>'.format(self.menu())
+        return '<Menu {}>'.format(self.meals)
