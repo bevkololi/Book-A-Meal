@@ -417,7 +417,7 @@ def create_app(config_name):
                         user.save()
                         response = {
                             'id': user.id,
-                            'username': meal.username,
+                            'username': user.username,
                             'email': user.email,
                             'password': user.password,
                             'caterer': user.caterer
@@ -507,43 +507,34 @@ def create_app(config_name):
                 current_user = User.query.filter_by(id=user_id).first()
                 if request.method == "POST":
                     if current_user.caterer:
-                        try:
-                            menu_meals = str(request.data.get('meal_list', ''))
-                            date = str(request.data.get('date', ''))
-                            # date = json_data.get('date')
-                            if date == '':
-                                date = datetime.utcnow().date()
-                            if menu_meals:
-                                meals = [Meal.get(id=id) for id in menu_meals]
-                                menu = Menu(date=date)
-                                menu.add_meal_to_menu(meals) 
-                                return {'message': 'Todays menu has been updated'}, 201
-                            return {'message': 'Please add meals to menu'}, 202
-                        except Exception as error:
-                            return {
-                                'message': 'an error occured',
-                                'Error': str(error)
-                            }       , 400
+                        menu_meals = request.data.get('meal_list', '')
+                        date = request.data.get('date', '')
+                        # date = json_data.get('date')
+                        if date == '':
+                            date = datetime.utcnow().date()
+                        if menu_meals:
+                            meals = [Meal.get(id=id) for id in menu_meals]
+                            menu = Menu(date=date)
+                            menu.add_meal_to_menu(meals) 
+                            return {'message': 'Todays menu has been updated'}, 201
+                        return {'message': 'Please add meals to menu'}, 202
+                        
                     else:
                               
                         response = {
-                            'message': 'You are not authorized to perform these functions'
+                            'message': 'You are unauthorized to access this'
                         }
                         return make_response(jsonify(response)), 401
 
                 else:
-                    try:
-                        menu_meals = Menu.get(date=datetime.utcnow().date())
-                        menu_meals = [item.make_dict() for item in menu_meals.meals]
-                        return {
-                            'message': 'Here is the menu for today',
-                            'menu': menu_meals
-                        }, 200
-                    except Exception as error:
-                        return {
-                            'message': 'an error occured',
-                            'Error': str(error)
-                }, 400  
+                
+                    menu_meals = Menu.get(date=datetime.utcnow().date())
+                    menu_meals = [item.make_dict() for item in menu_meals.meals]
+                    return {
+                        'message': 'Here is the menu for today',
+                        'menu': menu_meals
+                    }, 200
+                     
             else:
                 # user is not legit, so the payload is an error message
                 message = user_id
