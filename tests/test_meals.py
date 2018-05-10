@@ -14,6 +14,7 @@ class MealTestCase(unittest.TestCase):
         self.app_context.push()
         self.client = self.app.test_client
         self.meal = {'name': 'Ugali and sukuma wiki', 'description': 'This is ugali description', 'price': 20}
+        self.admin_user = dict(username='admin', email='admin@mail.com', password='admin1234', caterer=True)
 
         
         with self.app.app_context():
@@ -39,17 +40,14 @@ class MealTestCase(unittest.TestCase):
         }
         return self.client().post('/auth/login', data=user_data)
 
-    def login_admin(self, username= 'Some user', email="user@gmail.com", password="pass1234"):
-        admin = User(username=username, email=email, password=password)
-        admin.caterer = True
-        admin.save()
-        user_data = {
-            'username': username,
-            'email': email,
-            'password': password,
-            'caterer': True
-        }
-        return self.client().post('/auth/login', data=user_data)
+    def login_admin(self):
+        '''helper function to create an admin user and log them in '''
+        res = self.client.post('/auth/signup', data=json.dumps(self.admin_user))
+        assert(res.status_code, 201)
+        data = {'password': self.admin_user['password'], 'username': self.admin_user['username']}
+        res = self.client.post('/auth/login', data=json.dumps(data))
+        assert(res.status_code, 200)
+        return res
 
     def test_non_admin_cannot_create_meals(self):
         """Test that a non-caterer cannot create a meal (POST request)"""
