@@ -83,7 +83,7 @@ class MealTestCase(unittest.TestCase):
         res = self.client().post('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token), data=self.meal)
         self.assertEqual(res.status_code, 401)
         res = self.client().get('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token))
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, 401)
         
 
     def test_admin_can_get_meals(self):
