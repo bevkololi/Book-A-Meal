@@ -42,7 +42,7 @@ class AuthTestCase(unittest.TestCase):
         res = self.client().post('/auth/signup', data=self.user_data)
         self.assertEqual(res.status_code, 201)
         login_res = self.client().post('/auth/login', data=self.user_data)
-        result = json.loads(login_res.data)
+        result = json.loads(login_res.data.decode())
         self.assertEqual(result['message'], "You logged in successfully.")
         self.assertEqual(login_res.status_code, 200)
         
