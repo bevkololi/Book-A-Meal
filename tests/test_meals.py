@@ -62,8 +62,9 @@ class MealTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 401)
         self.assertEqual(result, expected)
 
-    def test_admin_can_creates_meals(self):
+    def test_admin_can_create_meals(self):
         """Test caterer can create a meal (POST request)"""
+        self.register_user()
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
