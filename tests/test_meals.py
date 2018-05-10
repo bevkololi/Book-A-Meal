@@ -40,7 +40,7 @@ class MealTestCase(unittest.TestCase):
         return self.client().post('/auth/login', data=user_data)
 
     def login_admin(self, username= 'Some user', email="user@gmail.com", password="pass1234"):
-        admin = User(username=username, email=email, password=password, caterer=True)
+        admin = User(username=username, email=email, password=password)
         admin.caterer = True
         admin.save()
         user_data = {
