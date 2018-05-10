@@ -42,7 +42,7 @@ class MealTestCase(unittest.TestCase):
 
     def login_admin(self):
         '''helper function to create an admin user and log them in '''
-        res = self.client.post('/auth/signup', data=json.dumps(self.admin_user))
+        res = self.client().post('/auth/signup', data=json.dumps(self.admin_user))
         assert(res.status_code, 201)
         data = {'password': self.admin_user['password'], 'username': self.admin_user['username']}
         res = self.client().post('/auth/login', data=json.dumps(data))
