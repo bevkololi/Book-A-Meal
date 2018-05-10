@@ -45,7 +45,7 @@ class MealTestCase(unittest.TestCase):
         res = self.client.post('/auth/signup', data=json.dumps(self.admin_user))
         assert(res.status_code, 201)
         data = {'password': self.admin_user['password'], 'username': self.admin_user['username']}
-        res = self.client.post('/auth/login', data=json.dumps(data))
+        res = self.client().post('/auth/login', data=json.dumps(data))
         assert(res.status_code, 200)
         return res
 
