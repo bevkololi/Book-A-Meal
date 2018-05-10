@@ -27,11 +27,11 @@ class User(db.Model):
 
     
 
-    # def __init__(self, username, email, password):
-    #     """Initialize the user with an email and a password."""
-    #     self.username = username
-    #     self.email = email
-    #     self.password = Bcrypt().generate_password_hash(password).decode()
+    def __init__(self, username, email, password):
+        """Initialize the user with an email and a password."""
+        self.username = username
+        self.email = email
+        self.password = Bcrypt().generate_password_hash(password).decode()
         
 
     def password_is_valid(self, password):
