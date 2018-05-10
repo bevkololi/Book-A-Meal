@@ -41,7 +41,7 @@ def create_app(config_name):
 
         if access_token:
             user_id = User.decode_token(access_token)
-            if not isinstance(user_id, str):
+            if user_id:
                 if request.method == "POST":
                     current_user = User.query.filter_by(id=user_id).first()
                     if current_user.caterer:
@@ -98,7 +98,7 @@ def create_app(config_name):
                 response = {
                     'message': message
                 }
-                return make_response(jsonify(response)), 402
+                return make_response(jsonify(response)), 401
 
 
         else:
