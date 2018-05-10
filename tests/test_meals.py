@@ -54,7 +54,8 @@ class MealTestCase(unittest.TestCase):
     def test_non_admin_cannot_create_meals(self):
         """Test that a non-caterer cannot create a meal (POST request)"""
         # self.register_user()
-        result = self.login_user()
+        result = self.login_admin()
+        self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
         res = self.client().post('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token), data=self.meal)
         expected = {"message": "You are unauthorized to access this"}
