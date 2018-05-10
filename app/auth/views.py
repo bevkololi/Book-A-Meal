@@ -55,7 +55,7 @@ class LoginView(MethodView):
                         'message': 'You logged in successfully.',
                         'access_token': access_token.decode()
                     }
-                    return make_response(jsonify(response)), 200
+                    return response, 200
             else:
                 # User does not exist
                 response = {
