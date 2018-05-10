@@ -55,11 +55,9 @@ class MealTestCase(unittest.TestCase):
         # self.register_user()
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
-        res = self.client().post('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token), data=self.meal)
-        expected = {"message": "You are unauthorized to access this"}
-        result = json.loads(res.data.decode('utf-8'))
+        res = self.client().post('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token), data=self.meal)        
         self.assertEqual(res.status_code, 401)
-        self.assertEqual(result, expected)
+        
 
     def test_admin_can_create_meals(self):
         """Test caterer can create a meal (POST request)"""
