@@ -39,7 +39,7 @@ class MealTestCase(unittest.TestCase):
         }
         return self.client().post('/auth/login', data=user_data)
 
-    def login_admin(self, username= 'Admin', email="admin@gmail.com", password="pass1234"):
+    def login_admin(self, username= 'Some user', email="user@gmail.com", password="pass1234"):
         admin = User(username=username, email=email, password=password)
         admin.caterer = True
         admin.save()
@@ -63,6 +63,7 @@ class MealTestCase(unittest.TestCase):
 
     def test_admin_can_create_meals(self):
         """Test caterer can create a meal (POST request)"""
+        self.register_user()
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
