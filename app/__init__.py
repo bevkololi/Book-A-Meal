@@ -98,7 +98,7 @@ def create_app(config_name):
                 response = {
                     'message': message
                 }
-                return make_response(jsonify(response)), 401
+                return make_response(jsonify(response)), 402
 
 
         else:
