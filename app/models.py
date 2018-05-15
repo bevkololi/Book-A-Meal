@@ -81,6 +81,7 @@ class User(db.Model):
             return jwt_string
 
         except Exception as e:
+            raise e
             # return an error in string format if an exception occurs
             return str(e)
 
