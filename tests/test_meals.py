@@ -67,7 +67,7 @@ class MealTestCase(unittest.TestCase):
         res = self.client().post('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token), data=self.meal)
         expected = 'Meal created successfully'
         result = json.loads(res.data.decode('utf-8'))['message']
-        # self.assertEqual(res.status_code, 201)
+        self.assertEqual(res.status_code, 201)
         self.assertEqual(result, expected)
         
 

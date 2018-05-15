@@ -41,7 +41,7 @@ def create_app(config_name):
 
         if access_token:
             user_id = User.decode_token(access_token)
-            if isinstance(user_id, str):
+            if isinstance(user_id, int):
                 if request.method == "POST":
                     current_user = User.query.filter_by(id=user_id).first()
                     if current_user.caterer:
@@ -90,7 +90,7 @@ def create_app(config_name):
 
                         return make_response(jsonify(results)), 200
                     else:
-                        return jsonify({'message': 'You are not authorized to access this'})
+                        return {'message': 'You are not authorized to access this'}, 401
 
             else:
                 # user is not legit, so the payload is an error message
