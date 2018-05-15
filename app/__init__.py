@@ -41,7 +41,7 @@ def create_app(config_name):
 
         if access_token:
             user_id = User.decode_token(access_token)
-            if user_id:
+            if isinstance(user_id, str):
                 if request.method == "POST":
                     current_user = User.query.filter_by(id=user_id).first()
                     if current_user.caterer:
