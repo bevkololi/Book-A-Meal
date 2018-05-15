@@ -117,7 +117,7 @@ def create_app(config_name):
 
         if access_token:
             user_id = User.decode_token(access_token)
-            if not isinstance(user_id, str):
+            if isinstance(user_id, int):
                 current_user = User.query.filter_by(id=user_id).first()
                 if current_user.caterer:
                     meal = Meal.query.filter_by(id=id).first()
@@ -186,7 +186,7 @@ def create_app(config_name):
 
         if access_token:
             user_id = User.decode_token(access_token)
-            if not isinstance(user_id, str):
+            if isinstance(user_id, int):
                 if request.method == "POST":
                     meal = str(request.data.get('meal', ''))
                     quantity = str(request.data.get('quantity', ''))
@@ -249,7 +249,7 @@ def create_app(config_name):
 
         if access_token:
             user_id = User.decode_token(access_token)
-            if not isinstance(user_id, str):
+            if isinstance(user_id, int):
                 if request.method == "POST":
                     current_user = User.query.filter_by(id=user_id).first()
                     if current_user.caterer:
@@ -326,7 +326,7 @@ def create_app(config_name):
 
         if access_token:
             user_id = User.decode_token(access_token)
-            if not isinstance(user_id, str):
+            if isinstance(user_id, int):
                 current_user = User.query.filter_by(id=user_id).first()
                 if current_user.caterer:
                     order = Order.query.filter_by(id=id).first()
@@ -394,7 +394,7 @@ def create_app(config_name):
 
         if access_token:
             user_id = User.decode_token(access_token)
-            if not isinstance(user_id, str):
+            if isinstance(user_id, int):
                 current_user = User.query.filter_by(id=user_id).first()
                 if current_user.caterer:
                     user = User.query.filter_by(id=id).first()
@@ -461,7 +461,7 @@ def create_app(config_name):
 
         if access_token:
             user_id = User.decode_token(access_token)
-            if not isinstance(user_id, str):
+            if isinstance(user_id, int):
                 current_user = User.query.filter_by(id=user_id).first()
                 if current_user.caterer:
                     user = User.query.filter_by(id=id).first()
@@ -503,7 +503,7 @@ def create_app(config_name):
 
         if access_token:
             user_id = User.decode_token(access_token)
-            if not isinstance(user_id, str):
+            if isinstance(user_id, int):
                 current_user = User.query.filter_by(id=user_id).first()
                 if request.method == "POST":
                     if current_user.caterer:
