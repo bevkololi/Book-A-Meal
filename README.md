@@ -1,4 +1,5 @@
 # BOOK A MEAL APP
+[![Build Status](https://travis-ci.org/bevkololi/Book-A-Meal.svg?branch=challenge3)](https://travis-ci.org/bevkololi/Book-A-Meal) [![Coverage Status](https://coveralls.io/repos/github/bevkololi/Book-A-Meal/badge.svg?branch=challenge3)](https://coveralls.io/github/bevkololi/Book-A-Meal?branch=challenge3)
 
 Book-A-Meal is an application that allows customers to make food orders and helps the food vendor know what the customers want to eat. This tracking helps keep work in order.
 Find it on https://bevkololi.github.io or clone the files from https://github.com/bevkololi/Book-A-Meal.git. You can then open index.html file on your browser. Documentation is also here https://bookameal2.docs.apiary.io/#
