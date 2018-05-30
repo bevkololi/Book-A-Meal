@@ -185,6 +185,39 @@ class MealTestCase(unittest.TestCase):
         result = self.client().get('api/v1/meals/1', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 404)
 
+    
+    def test_decode_auth_token(self):
+        result = self.login_admin()
+        self.assertEqual(200, result.status_code)
+        access_token = 'false access token'
+        res = self.client().post('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token), data=self.meal)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/meals/', headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(res.status_code, 401)
+        res = self.client().put('api/v1/meals/1', headers=dict(Authorization="Bearer " + access_token), data=self.meal)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/meals/1', headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(res.status_code, 401)
+        res = self.client().delete('api/v1/meals/1', headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(res.status_code, 401)
+
+    def test_no_access_token(self):
+        result = self.login_admin()
+        self.assertEqual(200, result.status_code)
+        access_token = None
+        res = self.client().post('api/v1/meals/', headers=dict(Authorization="Bearer "), data=self.meal)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/meals/', headers=dict(Authorization="Bearer "))
+        self.assertEqual(res.status_code, 401)
+        res = self.client().put('api/v1/meals/1', headers=dict(Authorization="Bearer "), data=self.meal)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/meals/1', headers=dict(Authorization="Bearer "))
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().delete('api/v1/meals/1', headers=dict(Authorization="Bearer "))
+        self.assertEqual(res.status_code, 401)
+        
+
     def tearDown(self):
         """teardown all initialized variables."""
         with self.app.app_context():

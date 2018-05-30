@@ -63,7 +63,27 @@ class UserTestCase(unittest.TestCase):
         result = self.client().get(
             '/api/v1/users/1',
             headers=dict(Authorization="Bearer " + access_token))
-        self.assertEqual(result.status_code, 200)   
+        self.assertEqual(result.status_code, 200) 
+
+    def test_non_admin_cannot_manpulate_users(self):
+        """Test API can get a single meal by using it's id."""
+        self.register_user()
+        result = self.login_user()
+        self.assertEqual(200, result.status_code)
+        access_token = json.loads(result.data.decode())['access_token']
+        access_token = json.loads(result.data.decode())['access_token']
+        result = self.client().get(
+            '/api/v1/users/1',
+            headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(result.status_code, 401)
+        result = self.client().put(
+            '/api/v1/users/1',
+            headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(result.status_code, 401)
+        result = self.client().delete(
+            '/api/v1/users/1',
+            headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(result.status_code, 401)   
 
     
     def test_admin_can_delete_user(self):
@@ -93,7 +113,7 @@ class UserTestCase(unittest.TestCase):
             headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 200) 
 
-    def test_nonuser_can_promote_users(self):
+    def test_nonuser_cannot_promote_users(self):
         """Test non-caterer cannot promote user (PUT request)."""
         self.register_user()
         result = self.login_user()
@@ -118,6 +138,33 @@ class UserTestCase(unittest.TestCase):
             })
         self.assertEqual(rv.status_code, 200)
         results = self.client().get('api/v1/users/1', headers=dict(Authorization="Bearer " + access_token))
+
+    def test_decode_auth_token(self):
+        result = self.login_admin()
+        self.assertEqual(200, result.status_code)
+        access_token = 'false access token'
+        res = self.client().put('api/v1/users/1', headers=dict(Authorization="Bearer " + access_token), data=self.user)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/users/1', headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(res.status_code, 401)
+        res = self.client().delete('api/v1/users/1', headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(res.status_code, 401)
+        res = self.client().put('api/v1/promote/user/1', headers=dict(Authorization="Bearer " + access_token), data=self.user)
+        self.assertEqual(res.status_code, 401)
+
+    def test_no_access_token(self):
+        result = self.login_admin()
+        self.assertEqual(200, result.status_code)
+        access_token = None
+        res = self.client().put('api/v1/users/1', headers=dict(Authorization="Bearer "), data=self.user)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/users/1', headers=dict(Authorization="Bearer "))
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().delete('api/v1/users/1', headers=dict(Authorization="Bearer "))
+        self.assertEqual(res.status_code, 401)
+        res = self.client().put('api/v1/promote/user/1', headers=dict(Authorization="Bearer "))
+        self.assertEqual(res.status_code, 401)
 
     def tearDown(self):
         """teardown all initialized variables."""

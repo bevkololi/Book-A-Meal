@@ -90,6 +90,24 @@ class MenuTestCase(unittest.TestCase):
         res = self.client().get('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 200)
         self.assertEqual('Here is the menu for today', json.loads(res.data.decode('utf-8'))['message'])
+
+    def test_decode_auth_token(self):
+        result = self.login_admin()
+        self.assertEqual(200, result.status_code)
+        access_token = 'false access token'
+        res = self.client().post('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token), data=self.menu)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(res.status_code, 401)
+
+    def test_no_access_token(self):
+        result = self.login_admin()
+        self.assertEqual(200, result.status_code)
+        access_token = None
+        res = self.client().post('api/v1/menu/', headers=dict(Authorization="Bearer "), data=self.menu)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/menu/', headers=dict(Authorization="Bearer "))
+        self.assertEqual(res.status_code, 401)
         
 
     

@@ -154,7 +154,45 @@ class OrderTestCase(unittest.TestCase):
         result = self.client().get('api/v1/orders/1', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 401)
 
+    def test_decode_auth_token(self):
+        result = self.login_admin()
+        self.assertEqual(200, result.status_code)
+        access_token = 'false access token'
+        res = self.client().post('api/v1/myorders/', headers=dict(Authorization="Bearer " + access_token), data=self.order)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/myorders/', headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(res.status_code, 401)
+        res = self.client().post('api/v1/orders/', headers=dict(Authorization="Bearer " + access_token), data=self.order)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/orders/', headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(res.status_code, 401)
+        res = self.client().put('api/v1/orders/1', headers=dict(Authorization="Bearer " + access_token), data=self.order)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/orders/1', headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(res.status_code, 401)
+        res = self.client().delete('api/v1/orders/1', headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(res.status_code, 401)
 
+    def test_no_access_token(self):
+        result = self.login_admin()
+        self.assertEqual(200, result.status_code)
+        access_token = None
+        res = self.client().post('api/v1/myorders/', headers=dict(Authorization="Bearer "), data=self.order)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/myorders/', headers=dict(Authorization="Bearer "))
+        self.assertEqual(res.status_code, 401)
+        res = self.client().post('api/v1/orders/', headers=dict(Authorization="Bearer "), data=self.order)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/orders/', headers=dict(Authorization="Bearer "))
+        self.assertEqual(res.status_code, 401)
+        res = self.client().put('api/v1/orders/1', headers=dict(Authorization="Bearer "), data=self.order)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/orders/1', headers=dict(Authorization="Bearer "))
+        self.assertEqual(res.status_code, 401)
+        res = self.client().delete('api/v1/orders/1', headers=dict(Authorization="Bearer "))
+        self.assertEqual(res.status_code, 401)
+
+        
 
     def tearDown(self):
         """teardown all initialized variables."""

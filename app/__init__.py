@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import request, jsonify, abort, make_response
 from datetime import datetime, timedelta
 
+
 # local import
 from instance.config import app_config
 
@@ -284,7 +285,7 @@ def create_app(config_name):
                 else:
                     current_user = User.query.filter_by(id=user_id).first()
                     if current_user.caterer:
-                        orders = Order.get_all(user_id)
+                        orders = Order.query.all()
                         results = []
 
                         for order in orders:
