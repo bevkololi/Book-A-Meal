@@ -33,7 +33,7 @@ def create_app(config_name):
 
     @app.route('/', methods=['GET'])
     def home():
-        return make_response(jsonify({'Welcome to Book A Meal'}), 200)
+        return (jsonify('Welcome to Book A Meal'))
 
 
 
