@@ -31,6 +31,9 @@ def create_app(config_name):
     def bad_request(error):
         return make_response(jsonify({'error': BAD_REQUEST}), 400)
 
+    @app.route('/', methods=['GET'])
+    def home():
+        return (jsonify('Welcome to Book A Meal'), 200)
 
 
 
