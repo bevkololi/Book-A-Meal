@@ -5,7 +5,7 @@ from app import db, create_app
 from app import models
 import unittest
 
-app = create_app(config_name=os.getenv('APP_SETTINGS'))
+# app = create_app(config_name=os.getenv('APP_SETTINGS'))
 migrate = Migrate(app, db)
 manager = Manager(app)
 
