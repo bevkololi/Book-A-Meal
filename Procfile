@@ -1,2 +1,2 @@
-heroku config:set PORT=5000
-web: python book_a_meal.py
+web: gunicorn app:app
+release: python manage.py db upgrade
