@@ -1,2 +1,2 @@
-web: gunicorn app:app
-release: python manage.py db upgrade
+heroku config:set PORT=5000
+web: python run.py
