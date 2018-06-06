@@ -1,7 +1,8 @@
 from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
 from flask import request, jsonify, abort, make_response
-from datetime import datetime, timedelta
+from datetime import timedelta
+import datetime
 
 
 # local import
@@ -48,6 +49,7 @@ def create_app(config_name):
             if isinstance(user_id, int):
                 if request.method == "POST":
                     current_user = User.query.filter_by(id=user_id).first()
+                    meal_ = Meal.query.filter_by(name=request.data['name']).first()
                     if current_user.caterer:
                         name = str(request.data.get('name', ''))
                         description = str(request.data.get('description', ''))
@@ -57,6 +59,8 @@ def create_app(config_name):
                         else:
                             return {"message": "Price should be a number"}
                         if name:
+                            if meal_:
+                                return jsonify({'message': 'This meal already exists!'})
                             meal = Meal(name=name, description=description, price=price)
                             meal.save()
                             response = jsonify({
@@ -142,11 +146,15 @@ def create_app(config_name):
                         else:
                             {"message": "Price should be a number" 
                      }, 200
-                        meal.name = name
-                        meal.description = description
-                        meal.price = price
+                        if name:
+                            meal.name = name
+                        if description:
+                            meal.description = description
+                        if price:
+                            meal.price = price
                         meal.save()
                         response = {
+                            'message': 'Meal updated successfully',
                             'id': meal.id,
                             'name': meal.name,
                             'description': meal.description,
@@ -187,33 +195,40 @@ def create_app(config_name):
     def myorders():
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
-
+        time_now = datetime.datetime.now()
+        today4pm = datetime.datetime.now().replace(hour=16, minute=0, second=0, microsecond=0)
         if access_token:
             user_id = User.decode_token(access_token)
             if isinstance(user_id, int):
                 if request.method == "POST":
-                    meal = str(request.data.get('meal', ''))
-                    quantity = str(request.data.get('quantity', ''))
-                    ordered_by = Order.ordered_by
-                    if quantity:
-                            int(quantity)
-                    else:
-                        return {"message": "Quantity should be a number" 
-                 }, 200
-                    if meal:
-                        order = Order(meal=meal, quantity=quantity, ordered_by=user_id)
-                        order.save()
-                        response = jsonify({
-                            'id': order.id,
-                            'meal': order.meal,
-                            'time_ordered': order.time_ordered,
-                            'quantity': order.quantity,
-                            'ordered_by': user_id
-                        })
+                    if time_now > today4pm :
+                        response = jsonify({"message": "The Order functionality is not available after 4pm"})
+                        return make_response(response), 404
 
-                        return make_response(response), 201
-                    else:
-                        return jsonify({'message': 'Please input the meal name and quantity'})
+                    else:                
+                        meal = str(request.data.get('meal', ''))
+                        quantity = str(request.data.get('quantity', ''))
+                        ordered_by = Order.ordered_by
+                        if quantity:
+                                int(quantity)
+                        else:
+                            return {"message": "Quantity should be a number" 
+                     }, 200
+                        if meal:
+                            order = Order(meal=meal, quantity=quantity, ordered_by=user_id)
+                            order.save()
+                            response = jsonify({
+                                'message': 'Meal ordered successfully',
+                                'id': order.id,
+                                'meal': order.meal,
+                                'time_ordered': order.time_ordered,
+                                'quantity': order.quantity,
+                                'ordered_by': user_id
+                            })
+
+                            return make_response(response), 201
+                        else:
+                            return jsonify({'message': 'Please input the meal name and quantity'})
 
                 else:
                     orders = Order.get_all(user_id)
@@ -244,17 +259,81 @@ def create_app(config_name):
             }
             return make_response(jsonify(response)), 401
 
+    @app.route('/api/v1/myorders/<int:id>', methods=['PUT', 'GET'])
+    def manipulate_myorder(id, **kwargs):
+
+        auth_header = request.headers.get('Authorization')
+        access_token = auth_header.split(" ")[1]
+        time_now = datetime.datetime.now()
+        today4pm = datetime.datetime.now().replace(hour=16, minute=0, second=0, microsecond=0)
+        if access_token:
+            user_id = User.decode_token(access_token)
+            if isinstance(user_id, int):
+                order = Order.query.filter_by(id=id).first()
+                if not order:
+                    abort(404)
+
+                if request.method == 'PUT':
+                    if time_now > today4pm :
+                        response = jsonify({"message": "The Order functionality is not available after 4pm"})
+                        return make_response(response), 404
+                    else:
+                        meal = str(request.data.get('meal', ''))
+                        quantity = str(request.data.get('quantity', ''))
+                        if meal:
+                            order.meal = meal
+                        if quantity:
+                            order.quantity = quantity
+                        order.save()
+                        response = {
+                            'message': 'Your order was successfully updated.',
+                            'id': order.id,
+                            'meal': order.meal,
+                            'time_ordered': order.time_ordered,
+                            'quantity': order.quantity,
+                            'ordered_by': user_id
+                        }
+                        return make_response(jsonify(response)), 200
+                else:
+                    # GET
+                    response = jsonify({
+                        'id': order.id,
+                        'meal': order.meal,
+                        'time_ordered': order.time_ordered,
+                        'quantity': order.quantity,
+                        'ordered_by': user_id
+                })
+                    return make_response(response), 200
+                
+            else:
+                # user is not legit, so the payload is an error message
+                message = user_id
+                response = {
+                    'message': message
+                }
+                return make_response(jsonify(response)), 401
+
+        else:
+            response = {
+                'message': 'Please input access token'
+            }
+            return make_response(jsonify(response)), 401
+
+
 
     @app.route('/api/v1/orders/', methods=['POST', 'GET'])
     def orders():
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
-        
-
+        time_now = datetime.datetime.now()
+        today4pm = datetime.datetime.now().replace(hour=16, minute=0, second=0, microsecond=0)
         if access_token:
             user_id = User.decode_token(access_token)
             if isinstance(user_id, int):
                 if request.method == "POST":
+                    if time_now > today4pm :
+                        response = jsonify({"message": "The Order functionality is not available after 4pm"})
+                        return make_response(response), 404
                     current_user = User.query.filter_by(id=user_id).first()
                     if current_user.caterer:
                         meal = str(request.data.get('meal', ''))
@@ -269,6 +348,7 @@ def create_app(config_name):
                             order = Order(meal=meal, quantity=quantity, ordered_by=user_id)
                             order.save()
                             response = jsonify({
+                                'message': 'Your order has successfully been made!',
                                 'id': order.id,
                                 'meal': order.meal,
                                 'time_ordered': order.time_ordered,
@@ -327,7 +407,8 @@ def create_app(config_name):
 
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
-
+        time_now = datetime.datetime.now()
+        today4pm = datetime.datetime.now().replace(hour=16, minute=0, second=0, microsecond=0)
         if access_token:
             user_id = User.decode_token(access_token)
             if isinstance(user_id, int):
@@ -343,19 +424,26 @@ def create_app(config_name):
                             "message": "order {} deleted".format(order.id)
                         }, 200
                     elif request.method == 'PUT':
-                        meal = str(request.data.get('meal', ''))
-                        quantity = str(request.data.get('quantity', ''))
-                        order.meal = meal
-                        order.quantity = quantity
-                        order.save()
-                        response = {
-                            'id': order.id,
-                            'meal': order.meal,
-                            'time_ordered': order.time_ordered,
-                            'quantity': order.quantity,
-                            'ordered_by': user_id
-                        }
-                        return make_response(jsonify(response)), 200
+                        if time_now > today4pm :
+                            response = jsonify({"message": "The Order functionality is not available after 4pm"})
+                            return make_response(response), 404
+                        else:
+                            meal = str(request.data.get('meal', ''))
+                            quantity = str(request.data.get('quantity', ''))
+                            if meal:
+                                order.meal = meal
+                            if quantity:
+                                order.quantity = quantity
+                            order.save()
+                            response = {
+                                'message': 'Your order has successfully been updated!',
+                                'id': order.id,
+                                'meal': order.meal,
+                                'time_ordered': order.time_ordered,
+                                'quantity': order.quantity,
+                                'ordered_by': user_id
+                            }
+                            return make_response(jsonify(response)), 200
                     else:
                         # GET
                         response = jsonify({
@@ -384,10 +472,7 @@ def create_app(config_name):
             response = {
                 'message': 'Please input access token'
             }
-            return make_response(jsonify(response)), 401
-
-
-    
+            return make_response(jsonify(response)), 401    
     
 
     @app.route('/api/v1/users/<int:id>', methods=['GET', 'PUT', 'DELETE'])
@@ -513,7 +598,6 @@ def create_app(config_name):
                     if current_user.caterer:
                         menu_meals = request.data.get('meal_list', '')
                         date = request.data.get('date', '')
-                        # date = json_data.get('date')
                         if date == '':
                             date = datetime.utcnow().date()
                         if menu_meals:
