@@ -37,7 +37,7 @@ def create_app(config_name):
     def home():
         return (jsonify('Welcome to Book A Meal'), 200)
 
-    @app.route('/api/v1/meals/', methods=['POST', 'GET'])
+    @app.route('/api/v2/meals/', methods=['POST', 'GET'])
     def meals():
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
@@ -115,7 +115,7 @@ def create_app(config_name):
             }
             return make_response(jsonify(response)), 401
 
-    @app.route('/api/v1/meals/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+    @app.route('/api/v2/meals/<int:id>', methods=['GET', 'PUT', 'DELETE'])
     def meals_manipulation(id, **kwargs):
 
         auth_header = request.headers.get('Authorization')
@@ -188,7 +188,7 @@ def create_app(config_name):
             }
             return make_response(jsonify(response)), 401
 
-    @app.route('/api/v1/myorders/', methods=['POST', 'GET'])
+    @app.route('/api/v2/myorders/', methods=['POST', 'GET'])
     def myorders():
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
@@ -259,7 +259,7 @@ def create_app(config_name):
             }
             return make_response(jsonify(response)), 401
 
-    @app.route('/api/v1/myorders/<int:id>', methods=['PUT', 'GET'])
+    @app.route('/api/v2/myorders/<int:id>', methods=['PUT', 'GET'])
     def manipulate_myorder(id, **kwargs):
 
         auth_header = request.headers.get('Authorization')
@@ -321,7 +321,7 @@ def create_app(config_name):
             }
             return make_response(jsonify(response)), 401
 
-    @app.route('/api/v1/orders/', methods=['POST', 'GET'])
+    @app.route('/api/v2/orders/', methods=['POST', 'GET'])
     def orders():
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
@@ -403,7 +403,7 @@ def create_app(config_name):
             }
             return make_response(jsonify(response)), 401
 
-    @app.route('/api/v1/orders/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+    @app.route('/api/v2/orders/<int:id>', methods=['GET', 'PUT', 'DELETE'])
     def order_manipulation(id, **kwargs):
 
         auth_header = request.headers.get('Authorization')
@@ -477,7 +477,7 @@ def create_app(config_name):
             }
             return make_response(jsonify(response)), 401
 
-    @app.route('/api/v1/users/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+    @app.route('/api/v2/users/<int:id>', methods=['GET', 'PUT', 'DELETE'])
     def users_manipulation(id, **kwargs):
 
         auth_header = request.headers.get('Authorization')
@@ -547,7 +547,7 @@ def create_app(config_name):
             }
             return make_response(jsonify(response)), 401
 
-    @app.route('/api/v1/promote/user/<int:id>', methods=['PUT'])
+    @app.route('/api/v2/promote/user/<int:id>', methods=['PUT'])
     def promote_user(id, **kwargs):
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
@@ -586,7 +586,7 @@ def create_app(config_name):
             }
             return make_response(jsonify(response)), 401
 
-    @app.route('/api/v1/menu/', methods=['POST', 'GET'])
+    @app.route('/api/v2/menu/', methods=['POST', 'GET'])
     def menu():
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
@@ -639,7 +639,7 @@ def create_app(config_name):
             }
             return make_response(jsonify(response)), 401
 
-    @app.route('/api/v1/menu', methods=['PUT', 'DELETE'])
+    @app.route('/api/v2/menu', methods=['PUT', 'DELETE'])
     def menu_manipulation():
 
         auth_header = request.headers.get('Authorization')
