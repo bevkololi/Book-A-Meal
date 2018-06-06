@@ -60,7 +60,7 @@ class UserTestCase(unittest.TestCase):
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
         result = self.client().get(
-            '/api/v1/users/1',
+            '/api/v2/users/1',
             headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 200)
 
@@ -71,15 +71,15 @@ class UserTestCase(unittest.TestCase):
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
         result = self.client().get(
-            '/api/v1/users/1',
+            '/api/v2/users/1',
             headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 401)
         result = self.client().put(
-            '/api/v1/users/1',
+            '/api/v2/users/1',
             headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 401)
         result = self.client().delete(
-            '/api/v1/users/1',
+            '/api/v2/users/1',
             headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 401)
 
@@ -91,14 +91,14 @@ class UserTestCase(unittest.TestCase):
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
         result = self.client().get(
-            '/api/v1/users/1',
+            '/api/v2/users/1',
             headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 200)
-        res = self.client().delete('api/v1/users/1',
+        res = self.client().delete('api/v2/users/1',
                                    headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 200)
         result = self.client().get(
-            'api/v1/users/1', headers=dict(Authorization="Bearer " + access_token))
+            'api/v2/users/1', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 404)
 
     def test_admin_can_promote_users(self):
@@ -107,7 +107,7 @@ class UserTestCase(unittest.TestCase):
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
         result = self.client().put(
-            '/api/v1/promote/user/1',
+            '/api/v2/promote/user/1',
             headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 200)
 
@@ -118,7 +118,7 @@ class UserTestCase(unittest.TestCase):
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
         result = self.client().put(
-            '/api/v1/promote/user/1',
+            '/api/v2/promote/user/1',
             headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 401)
 
@@ -130,28 +130,28 @@ class UserTestCase(unittest.TestCase):
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
         rv = self.client().put(
-            'api/v1/users/1', headers=dict(Authorization="Bearer " + access_token),
+            'api/v2/users/1', headers=dict(Authorization="Bearer " + access_token),
             data={
                 'username': 'Sharon', 'email': 'sharon@gmail.com', 'password': 'pass1234'
             })
         self.assertEqual(rv.status_code, 200)
         results = self.client().get(
-            'api/v1/users/1', headers=dict(Authorization="Bearer " + access_token))
+            'api/v2/users/1', headers=dict(Authorization="Bearer " + access_token))
 
     def test_decode_auth_token(self):
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = 'false access token'
-        res = self.client().put('api/v1/users/1',
+        res = self.client().put('api/v2/users/1',
                                 headers=dict(Authorization="Bearer " + access_token), data=self.user)
         self.assertEqual(res.status_code, 401)
-        res = self.client().get('api/v1/users/1',
+        res = self.client().get('api/v2/users/1',
                                 headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 401)
-        res = self.client().delete('api/v1/users/1',
+        res = self.client().delete('api/v2/users/1',
                                    headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 401)
-        res = self.client().put('api/v1/promote/user/1',
+        res = self.client().put('api/v2/promote/user/1',
                                 headers=dict(Authorization="Bearer " + access_token), data=self.user)
         self.assertEqual(res.status_code, 401)
 
@@ -159,15 +159,15 @@ class UserTestCase(unittest.TestCase):
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = None
-        res = self.client().put('api/v1/users/1',
+        res = self.client().put('api/v2/users/1',
                                 headers=dict(Authorization="Bearer "), data=self.user)
         self.assertEqual(res.status_code, 401)
-        res = self.client().get('api/v1/users/1', headers=dict(Authorization="Bearer "))
+        res = self.client().get('api/v2/users/1', headers=dict(Authorization="Bearer "))
         self.assertEqual(res.status_code, 401)
         self.assertEqual(res.status_code, 401)
-        res = self.client().delete('api/v1/users/1', headers=dict(Authorization="Bearer "))
+        res = self.client().delete('api/v2/users/1', headers=dict(Authorization="Bearer "))
         self.assertEqual(res.status_code, 401)
-        res = self.client().put('api/v1/promote/user/1',
+        res = self.client().put('api/v2/promote/user/1',
                                 headers=dict(Authorization="Bearer "))
         self.assertEqual(res.status_code, 401)
 

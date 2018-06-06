@@ -59,7 +59,7 @@ class MenuTestCase(unittest.TestCase):
         """Test non-caterer cannot create a menu (POST request)"""
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
-        res = self.client().post('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token), data=self.menu)
+        res = self.client().post('api/v2/menu/', headers=dict(Authorization="Bearer " + access_token), data=self.menu)
         expected = {"message": "You are unauthorized to access this"}
         result = json.loads(res.data.decode('utf-8'))
         self.assertEqual(res.status_code, 401)
@@ -70,7 +70,7 @@ class MenuTestCase(unittest.TestCase):
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
-        res = self.client().post('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token), data=self.menu)
+        res = self.client().post('api/v2/menu/', headers=dict(Authorization="Bearer " + access_token), data=self.menu)
         expected = "Todays menu has been updated"
         result = json.loads(res.data.decode('utf-8'))['message']
         self.assertEqual(res.status_code, 201)
@@ -88,7 +88,7 @@ class MenuTestCase(unittest.TestCase):
         result = self.login_user()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
-        res = self.client().get('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token))
+        res = self.client().get('api/v2/menu/', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 200)
         self.assertEqual('Here is the menu for today', json.loads(res.data.decode('utf-8'))['message'])
 
@@ -97,11 +97,11 @@ class MenuTestCase(unittest.TestCase):
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
         rv = self.client().post(
-            'api/v1/menu/', headers=dict(Authorization="Bearer " + access_token),
+            'api/v2/menu/', headers=dict(Authorization="Bearer " + access_token),
             data={'meal_list': [1]})
         self.assertEqual(rv.status_code, 401)
         rv = self.client().put(
-            'api/v1/menu/', headers=dict(Authorization="Bearer " + access_token),
+            'api/v2/menu/', headers=dict(Authorization="Bearer " + access_token),
             data={'meal_list': [1, 2]})
         self.assertEqual(rv.status_code, 401)
 
@@ -118,7 +118,7 @@ class MenuTestCase(unittest.TestCase):
         access_token = json.loads(result.data.decode())['access_token']
         
         rv = self.client().put(
-            'api/v1/menu/', headers=dict(Authorization="Bearer " + access_token),
+            'api/v2/menu/', headers=dict(Authorization="Bearer " + access_token),
             data={'meal_list': [1, 2]})
         self.assertEqual(rv.status_code, 200)
         
@@ -129,10 +129,10 @@ class MenuTestCase(unittest.TestCase):
         result = self.login_user()
         access_token = json.loads(result.data.decode())['access_token']
         rv = self.client().put(
-            'api/v1/menu', headers=dict(Authorization="Bearer " + access_token),
+            'api/v2/menu', headers=dict(Authorization="Bearer " + access_token),
             data={'meal_list': [2]})
         self.assertEqual(rv.status_code, 401)
-        res = self.client().delete('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token))
+        res = self.client().delete('api/v2/menu/', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 401)
         
 
@@ -147,7 +147,7 @@ class MenuTestCase(unittest.TestCase):
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
-        res = self.client().delete('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token))
+        res = self.client().delete('api/v2/menu/', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 200)
         
 
@@ -156,26 +156,26 @@ class MenuTestCase(unittest.TestCase):
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = 'false access token'
-        res = self.client().post('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token), data=self.menu)
+        res = self.client().post('api/v2/menu/', headers=dict(Authorization="Bearer " + access_token), data=self.menu)
         self.assertEqual(res.status_code, 401)
-        res = self.client().get('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token))
+        res = self.client().get('api/v2/menu/', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 401)
-        res = self.client().put('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token), data=self.menu)
+        res = self.client().put('api/v2/menu/', headers=dict(Authorization="Bearer " + access_token), data=self.menu)
         self.assertEqual(res.status_code, 401)
-        res = self.client().delete('api/v1/menu/', headers=dict(Authorization="Bearer " + access_token))
+        res = self.client().delete('api/v2/menu/', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 401)
 
     def test_no_access_token(self):
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = None
-        res = self.client().post('api/v1/menu/', headers=dict(Authorization="Bearer "), data=self.menu)
+        res = self.client().post('api/v2/menu/', headers=dict(Authorization="Bearer "), data=self.menu)
         self.assertEqual(res.status_code, 401)
-        res = self.client().get('api/v1/menu/', headers=dict(Authorization="Bearer "))
+        res = self.client().get('api/v2/menu/', headers=dict(Authorization="Bearer "))
         self.assertEqual(res.status_code, 401)
-        res = self.client().put('api/v1/menu/', headers=dict(Authorization="Bearer "), data=self.menu)
+        res = self.client().put('api/v2/menu/', headers=dict(Authorization="Bearer "), data=self.menu)
         self.assertEqual(res.status_code, 401)
-        res = self.client().delete('api/v1/menu/', headers=dict(Authorization="Bearer "))
+        res = self.client().delete('api/v2/menu/', headers=dict(Authorization="Bearer "))
         self.assertEqual(res.status_code, 401)
         
         
