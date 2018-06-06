@@ -15,7 +15,7 @@ BAD_REQUEST = 'Bad request'
 db = SQLAlchemy()
 
 def create_app(config_name):
-    from datetime import datetime
+    # from datetime import datetime
     from app.models import Meal, User, Order, Menu
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
@@ -197,7 +197,7 @@ def create_app(config_name):
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
         time_now = datetime.datetime.now()
-        today4pm = datetime.datetime.now().replace(hour=16, minute=0, second=0, microsecond=0)
+        today4pm = datetime.datetime.now().replace(hour=23, minute=0, second=0, microsecond=0)
         if access_token:
             user_id = User.decode_token(access_token)
             if isinstance(user_id, int):
@@ -266,7 +266,7 @@ def create_app(config_name):
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
         time_now = datetime.datetime.now()
-        today4pm = datetime.datetime.now().replace(hour=16, minute=0, second=0, microsecond=0)
+        today4pm = datetime.datetime.now().replace(hour=23, minute=0, second=0, microsecond=0)
         if access_token:
             user_id = User.decode_token(access_token)
             if isinstance(user_id, int):
@@ -327,12 +327,12 @@ def create_app(config_name):
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
         time_now = datetime.datetime.now()
-        today4pm = datetime.datetime.now().replace(hour=16, minute=0, second=0, microsecond=0)
+        today4pm = datetime.datetime.now().replace(hour=23, minute=0, second=0, microsecond=0)
         if access_token:
             user_id = User.decode_token(access_token)
             if isinstance(user_id, int):
                 if request.method == "POST":
-                    if time_now > today4pm :
+                    if time_now > today4pm:
                         response = jsonify({"message": "The Order functionality is not available after 4pm"})
                         return make_response(response), 404
                     current_user = User.query.filter_by(id=user_id).first()
@@ -409,7 +409,7 @@ def create_app(config_name):
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(" ")[1]
         time_now = datetime.datetime.now()
-        today4pm = datetime.datetime.now().replace(hour=16, minute=0, second=0, microsecond=0)
+        today4pm = datetime.datetime.now().replace(hour=23, minute=0, second=0, microsecond=0)
         if access_token:
             user_id = User.decode_token(access_token)
             if isinstance(user_id, int):
@@ -603,7 +603,7 @@ def create_app(config_name):
                         menu_meals = request.data.get('meal_list', '')
                         date = request.data.get('date', '')
                         if date == '':
-                            date = datetime.utcnow().date()
+                            date = datetime.datetime.now()
                         if menu_meals:
                             meals = [Meal.get(id=id) for id in menu_meals]
                             menu = Menu(date=date)
@@ -669,7 +669,7 @@ def create_app(config_name):
                         menu.delete()
 
                         if date == '':
-                            date = datetime.utcnow().date()
+                            date = datetime.datetime.now()
                         if menu_meals:
                             meals = [Meal.get(id=id) for id in menu_meals]
                             menu = Menu(date=date)
@@ -678,11 +678,8 @@ def create_app(config_name):
                         'message': 'The menu has successfully been updated',
                         'menu': menu_meals
                     }, 200
-                        return {'message': 'Please add meals to menu'}, 202
-
-                                                                   
-                        menu.save()
-                                            
+                        return {'message': 'Please add meals to menu'}, 202                                                                   
+                        menu.save()                                            
                 else:
                                   
                     response = {

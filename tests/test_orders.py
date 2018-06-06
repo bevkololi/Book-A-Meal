@@ -3,6 +3,7 @@ import os
 import json
 from . import create_app, db
 from . import User
+import datetime
 
 class OrderTestCase(unittest.TestCase):
     """This class represents the Order test case"""
@@ -56,6 +57,15 @@ class OrderTestCase(unittest.TestCase):
         return self.client().post('/auth/login', data=user_data)
 
     def test_non_admin_can_create_order(self):
+        """Test user can create an order (POST request)"""
+        self.register_user()
+        result = self.login_user()
+        access_token = json.loads(result.data.decode())['access_token']
+        res = self.client().post('api/v1/myorders/', headers=dict(Authorization="Bearer " + access_token), data=self.order)
+        self.assertEqual(res.status_code, 201)
+        self.assertIn('Ugali', str(res.data))
+
+    def test_time_functionality_of_order(self):
         """Test user can create an order (POST request)"""
         self.register_user()
         result = self.login_user()
@@ -126,6 +136,38 @@ class OrderTestCase(unittest.TestCase):
         results = self.client().get('api/v1/orders/1', headers=dict(Authorization="Bearer " + access_token))
         self.assertIn('stewed meat', str(results.data))
 
+    def test_user_can_edit_his_order_by_id(self):
+        """Terst caterer can edit an existing order. (PUT request)"""
+        self.register_user()
+        result = self.login_user()
+        access_token = json.loads(result.data.decode())['access_token']
+        rv = self.client().post(
+            'api/v1/myorders/', headers=dict(Authorization="Bearer " + access_token),
+            data={'meal': 'Spaghetti and rice', 'quantity': 3})
+        self.assertEqual(rv.status_code, 201)
+        rv = self.client().put(
+            'api/v1/myorders/1', headers=dict(Authorization="Bearer " + access_token),
+            data={
+                'meal': 'Spaghetti and rice and stewed meat', 'quantity': 2
+            })
+        self.assertEqual(rv.status_code, 200)
+        results = self.client().get('api/v1/myorders/1', headers=dict(Authorization="Bearer " + access_token))
+        self.assertIn('stewed meat', str(results.data))
+
+    def test_user_can_get_his_order_by_id(self):
+        """Terst caterer can edit an existing order. (GET request)"""
+        self.register_user()
+        result = self.login_user()
+        access_token = json.loads(result.data.decode())['access_token']
+        rv = self.client().post('api/v1/myorders/', headers=dict(Authorization="Bearer " + access_token), data=self.order)
+        self.assertEqual(rv.status_code, 201)
+        results = json.loads(rv.data.decode())
+        result_in_json = json.loads(rv.data.decode('utf-8').replace("'", "\""))
+        result = self.client().get(
+            '/api/v1/myorders/1',
+            headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(result.status_code, 200)
+
     def test_order_deletion_by_admin(self):
         """Test caterer can delete an existing order. (DELETE request)."""
         result = self.login_admin()
@@ -162,6 +204,10 @@ class OrderTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 401)
         res = self.client().get('api/v1/myorders/', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 401)
+        res = self.client().put('api/v1/myorders/1', headers=dict(Authorization="Bearer " + access_token), data=self.order)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/myorders/1', headers=dict(Authorization="Bearer " + access_token))
+        self.assertEqual(res.status_code, 401)
         res = self.client().post('api/v1/orders/', headers=dict(Authorization="Bearer " + access_token), data=self.order)
         self.assertEqual(res.status_code, 401)
         res = self.client().get('api/v1/orders/', headers=dict(Authorization="Bearer " + access_token))
@@ -180,6 +226,10 @@ class OrderTestCase(unittest.TestCase):
         res = self.client().post('api/v1/myorders/', headers=dict(Authorization="Bearer "), data=self.order)
         self.assertEqual(res.status_code, 401)
         res = self.client().get('api/v1/myorders/', headers=dict(Authorization="Bearer "))
+        self.assertEqual(res.status_code, 401)
+        res = self.client().put('api/v1/myorders/1', headers=dict(Authorization="Bearer "), data=self.order)
+        self.assertEqual(res.status_code, 401)
+        res = self.client().get('api/v1/myorders/1', headers=dict(Authorization="Bearer "))
         self.assertEqual(res.status_code, 401)
         res = self.client().post('api/v1/orders/', headers=dict(Authorization="Bearer "), data=self.order)
         self.assertEqual(res.status_code, 401)

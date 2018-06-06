@@ -71,7 +71,6 @@ class UserTestCase(unittest.TestCase):
         result = self.login_user()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
-        access_token = json.loads(result.data.decode())['access_token']
         result = self.client().get(
             '/api/v1/users/1',
             headers=dict(Authorization="Bearer " + access_token))
