@@ -15,6 +15,7 @@ BAD_REQUEST = 'Bad request'
 db = SQLAlchemy()
 
 def create_app(config_name):
+    from datetime import datetime
     from app.models import Meal, User, Order, Menu
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
@@ -496,13 +497,16 @@ def create_app(config_name):
                             "message": "user {} has been deleted".format(user.id)
                         }, 200
                     elif request.method == 'PUT':
-                        username = str(request.data.get('user', ''))
+                        username = str(request.data.get('username', ''))
                         email = str(request.data.get('email', ''))
                         password = str(request.data.get('password', ''))
                         
-                        user.username = username
-                        user.email = email
-                        user.password = password
+                        if username:
+                            user.username = username
+                        if email:
+                            user.email = email
+                        if password:
+                            user.password = password
                         user.save()
                         response = {
                             'id': user.id,
@@ -605,6 +609,7 @@ def create_app(config_name):
                             menu = Menu(date=date)
                             menu.add_meal_to_menu(meals) 
                             return {'message': 'Todays menu has been updated'}, 201
+                            
                         return {'message': 'Please add meals to menu'}, 202
                         
                     else:
@@ -614,7 +619,7 @@ def create_app(config_name):
                         }
                         return make_response(jsonify(response)), 401
 
-                else:
+                else: #GET
                 
                     menu = Menu.query.order_by('menu.date').all()[-1]
                     menu_meals = [item.make_dict() for item in menu.meals]
@@ -622,7 +627,8 @@ def create_app(config_name):
                         'message': 'Here is the menu for today',
                         'menu': menu_meals
                     }, 200
-                     
+                
+                         
             else:
                 # user is not legit, so the payload is an error message
                 message = user_id
@@ -636,6 +642,67 @@ def create_app(config_name):
                 'message': 'Please input access token'
             }
             return make_response(jsonify(response)), 401    
+
+    @app.route('/api/v1/menu', methods=['PUT', 'DELETE'])
+    def menu_manipulation():
+
+        auth_header = request.headers.get('Authorization')
+        access_token = auth_header.split(" ")[1]
+
+        if access_token:
+            user_id = User.decode_token(access_token)
+            if isinstance(user_id, int):
+                current_user = User.query.filter_by(id=user_id).first()
+                if current_user.caterer:
+                    menu = Menu.query.order_by('menu.date').all()[-1]
+                    if not menu:
+                        abort(404)
+
+                    if request.method == "DELETE":
+                        menu.delete()
+                        return {
+                            "message": "Todays menu has been deleted".format(menu.id)
+                        }, 200
+                    elif request.method == 'PUT':
+                        menu_meals = request.data.get('meal_list', '')
+                        date = request.data.get('date', '')
+                        menu.delete()
+
+                        if date == '':
+                            date = datetime.utcnow().date()
+                        if menu_meals:
+                            meals = [Meal.get(id=id) for id in menu_meals]
+                            menu = Menu(date=date)
+                            menu.add_meal_to_menu(meals) 
+                            return {
+                        'message': 'The menu has successfully been updated',
+                        'menu': menu_meals
+                    }, 200
+                        return {'message': 'Please add meals to menu'}, 202
+
+                                                                   
+                        menu.save()
+                                            
+                else:
+                                  
+                    response = {
+                        'message': 'You are not authorized to perform these functions'
+                    }
+                    return make_response(jsonify(response)), 401
+
+            else:
+                # user is not legit, so the payload is an error message
+                message = user_id
+                response = {
+                    'message': message
+                }
+                return make_response(jsonify(response)), 401
+
+        else:
+            response = {
+                'message': 'Please input access token'
+            }
+            return make_response(jsonify(response)), 401
 
 
 

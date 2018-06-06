@@ -141,9 +141,9 @@ class Meal(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def add_to_menu(self):
-        '''method to add meal to todays menu'''
-        Menu.add_meal(self)
+    # def add_to_menu(self):
+    #     '''method to add meal to todays menu'''
+    #     Menu.add_meal(self)
 
     def __repr__(self):
         """Return a representation of a meal instance."""
@@ -249,7 +249,7 @@ class Menu(db.Model):
             menu = Menu()
         if isinstance(meal, Meal):
             meal = [meal]
-        self.meals.extend(meal)
+        self.add('meals',meal)
         self.save()
     
 
@@ -266,9 +266,19 @@ class Menu(db.Model):
                             'Error': str(error)
                 }, 400 
 
+    def delete(self):
+        """Deletes a given meal."""
+        db.session.delete(self)
+        db.session.commit()
+
+
     @classmethod
     def get(cls, **kwargs):
         return cls.query.filter_by(**kwargs).first()
+
+    @staticmethod
+    def get_all():
+        return Menu.query.all()
 
     def __repr__(self):
         '''class instance rep'''
