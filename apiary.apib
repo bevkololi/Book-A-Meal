@@ -82,8 +82,7 @@ password must be four(4) characters and more.
 
 ### Register a user [POST]
 
-You can create a user by sending a json request with an email and password. The
-password must be four(4) characters and more.
+You can create a user by sending a json request with a username, email and password.
 
 
 + Request (application/json)
@@ -188,7 +187,8 @@ Caterer could use this to view meals and users too
         }
 
 ## Meal manipulation [api/v1/meals/<int:id>]
-### Get a Bucket [GET]
+
+### Get a Meal [GET]
 You get a single meal by specifying its Id. (Caterer only)
 
 + Parameters
@@ -261,4 +261,3 @@ A specific meal can be deleted (Caterer)
         {
             "message": "meal 1 deleted"
         }
-
