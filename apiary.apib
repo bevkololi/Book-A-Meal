@@ -1,5 +1,6 @@
 FORMAT: 1A
 HOST: https://bookamealdb-api-heroku.herokuapp.com
+
 # Book A Meal API
 
 Book-A-Meal is an application that allows customers to make food orders and helps the food vendor know what the customers want to eat. This tracking helps keep work in order.
@@ -34,48 +35,230 @@ Find it on https://bevkololi.github.io or clone the files from https://github.co
 
 # Reference
 
-Meal
+## Home message [/]
+
+### Home [GET]
+
+Welcoming message to Book A Meal
+
++ Request (application/json)
+
+        
+
++ Response 200 (application/json)
+
+        "Welcome to Book A Meal"
+
+
+## User Registration [/auth/signup]
+
+### Register [POST]
+
+You can create a user by sending a json request with an email and password. The
+password must be four(4) characters and more.
+
++ Request (application/json)
+
+        {   
+            "username": "Emily",
+            "email": "emily@gmail.com",
+            "password": "pass1234"
+        }
+
++ Response 201 (application/json)
+
+        {
+            'message': 'You registered successfully. Please login.'
+        }
+
+
++ Response 202 (application/json)
+
+        {
+            'message': 'User already exists. Please login.'
+        }
+        
+## User Login [/auth/login]
+
+### Register a user [POST]
+
+You can create a user by sending a json request with an email and password. The
+password must be four(4) characters and more.
+
+
++ Request (application/json)
+
+        {   
+            "username": "Emily",
+            "email": "emily@gmail.com",
+            "password": "pass1234"
+        }
+        
+    + Headers
+
+            Authorization: Bearer JWT Token
+
++ Response 201 (application/json)
+
+        {
+            'message': 'You registered successfully. Please login.'
+        }
+
+
++ Response 202 (application/json)
+
+        {
+            'message': 'User already exists. Please login.'
+        }
+
+### Create a Meal (Caterer Only) [POST]
+    Add a new Bucket attached to the user. 
+    NOTE: A valid token should be present in the header else a 401 or 403 response
+    will be returned as seen in the log out section.
+
++ name (required, string) -  Name of the Meal
++ description (required, string) -  A description of the meal e.g contents
++ price (required, integer) -  The price of the specific meal
+
++ Request (application/json)
+
+
+    + Headers
+
+            Authorization: Bearer JWT Token
+
+    + Body
+
+        {
+            "ingredients": "Ugali, fish, vegetables, spices",
+            "name": "Ugali and fish",
+            "price": 150
+        }
+
++ Response 201 (application/json)
+
+        {
+            "descrption": "Ugali, fish, vegetables, spices",
+            "id": 1,
+            "message": "Meal created successfully",
+            "name": "Ugali and fish",
+            "price": 150
+        }
+
 ## View all meals [api/v1/meals]
 
 ### Get meals [GET]
 
 Caterer could use this to view meals and users too
 
++ Request (application/json)
+
+
+    + Headers
+
+            Authorization: Bearer JWT Token
+
 + Response 200 (application/json)
 
+        [
+            {
+                "description": "With vegetables to go with",
+                "id": 1,
+                "name": "Ugali and nicely fried eggs",
+                "price": 70
+            },
+            {
+                "description": "Blaaaaah",
+                "id": 2,
+                "name": "Chai and maandazi",
+                "price": 20
+            },
+            {
+                "description": "Blaaaaah",
+                "id": 3,
+                "name": "Matoke and beef",
+                "price": 100
+            }
+        ]
+
++ Response 202 (application/json)
+
         {
-            "meals": [
-                {
-                    "id": 1,
-                    "ingredients": "Ugali, fish, vegetables, spices",
-                    "name": "Ugali and fish",
-                    "price": 150
-                },
-                    "ingredients": "Cooked rice, salad, stewed beef",
-                    "name": "Rice and beef",
-                {
-                    "id": 2,
-                    "price": 320
-                },
-                {
-                    "id": 3,
-                    "ingredients": "Unripe cooked banana, stew, mutton, appetizer",
-                    "name": "Matoke and mutton",
-                    "price": 250
-                }
-            ]
+            "message": "This meal already exists!"
         }
 
-## Update meals [api/v1/meals/<int:id>]
-### Create a New meal [POST]
+## Meal manipulation [api/v1/meals/<int:id>]
+### Get a Bucket [GET]
+You get a single meal by specifying its Id. (Caterer only)
 
-Caterer could create meals that would be stored in the meals list
++ Parameters
+    + meal_id (required,integer) - Id of the meal to be returned
+
 
 + Request (application/json)
 
+
+    + Headers
+
+            Authorization: Bearer JWT Token
+
+
++ Response 200 (application/json)
+
         {
-            "id": 4,
-            "ingredients": "Managu ang githeri mixed with mashed potatoes",
-            "name": "Food added",
-            "price": 300
+            "description": "With vegetables to go with",
+            "id": 1,
+            "name": "Ugali and nicely fried eggs",
+            "price": 70
         }
+
+
+### Edit a Meal [PUT]
+
+You can update the properties of a meal.
+
++ name (string) -  Name of the Meal
++ description (string) - description of the meal
++ price (integer) - price of the meal
+
++ Request (application/json)
+
+
+    + Headers
+
+            Authorization: Bearer JWT Token
+
+    + Body
+
+            {
+              "name": "Chips and chicken"
+            }
+
++ Response 200 (application/json)
+
+        {
+            "description": "With vegetables to go with",
+            "id": 1,
+            "message": "Meal updated successfully",
+            "name": "Chicken and chips",
+            "price": 70
+        
+        }
+
+
+### Delete a Meal [DELETE]
+A specific meal can be deleted (Caterer)
+
++ Request (application/json)
+
+
+    + Headers
+
+            Authorization: Bearer JWT Token
+
++ Response 200 (application/json)
+
+        {
+            "message": "meal 1 deleted"
+        }
+

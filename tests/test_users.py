@@ -4,6 +4,7 @@ import json
 from . import create_app, db
 from . import User
 
+
 class UserTestCase(unittest.TestCase):
     """This class represents the Meal test case"""
 
@@ -13,16 +14,16 @@ class UserTestCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         self.client = self.app.test_client
-        self.user = {'username': 'Joseph Joe', 'email': 'joe@gmail.com', 'password': 'pass1234', 'caterer':False}
+        self.user = {'username': 'Joseph Joe', 'email': 'joe@gmail.com',
+                     'password': 'pass1234', 'caterer': False}
 
-        
         with self.app.app_context():
-            #create all tables
+            # create all tables
             db.session.close()
             db.drop_all()
             db.create_all()
 
-    def register_user(self, username= 'Some user', email="user@gmail.com", password="pass1234"):
+    def register_user(self, username='Some user', email="user@gmail.com", password="pass1234"):
         user_data = {
             'username': username,
             'email': email,
@@ -30,10 +31,10 @@ class UserTestCase(unittest.TestCase):
         }
         user = User(username=username, email=email, password=password)
         user.save()
-  
-        return None #self.client().post('/auth/signup', data=user_data)
 
-    def login_user(self, username= 'Some user', email="user@gmail.com", password="pass1234"):
+        return None  # self.client().post('/auth/signup', data=user_data)
+
+    def login_user(self, username='Some user', email="user@gmail.com", password="pass1234"):
         user_data = {
             'username': username,
             'email': email,
@@ -41,9 +42,9 @@ class UserTestCase(unittest.TestCase):
         }
         return self.client().post('/auth/login', data=user_data)
 
-    def login_admin(self, username= 'Some user', email="user@gmail.com", password="pass1234", caterer=True):
+    def login_admin(self, username='Some user', email="user@gmail.com", password="pass1234", caterer=True):
         admin = User(username=username, email=email, password=password)
-        admin.caterer =caterer
+        admin.caterer = caterer
         admin.save()
         user_data = {
             'username': username,
@@ -53,17 +54,15 @@ class UserTestCase(unittest.TestCase):
         }
         return self.client().post('/auth/login', data=user_data)
 
-    
-
     def test_admin_can_manpulate_users(self):
         """Test API can get a single meal by using it's id."""
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
         result = self.client().get(
-            '/api/v1/users/1',
+            '/api/v2/users/1',
             headers=dict(Authorization="Bearer " + access_token))
-        self.assertEqual(result.status_code, 200) 
+        self.assertEqual(result.status_code, 200)
 
     def test_non_admin_cannot_manpulate_users(self):
         """Test API can get a single meal by using it's id."""
@@ -71,21 +70,19 @@ class UserTestCase(unittest.TestCase):
         result = self.login_user()
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
-        access_token = json.loads(result.data.decode())['access_token']
         result = self.client().get(
-            '/api/v1/users/1',
+            '/api/v2/users/1',
             headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 401)
         result = self.client().put(
-            '/api/v1/users/1',
+            '/api/v2/users/1',
             headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 401)
         result = self.client().delete(
-            '/api/v1/users/1',
+            '/api/v2/users/1',
             headers=dict(Authorization="Bearer " + access_token))
-        self.assertEqual(result.status_code, 401)   
+        self.assertEqual(result.status_code, 401)
 
-    
     def test_admin_can_delete_user(self):
         """Test API can delete an existing meal. (DELETE request)."""
         user = User(username='pp', email='pp@m', password='12334455')
@@ -94,14 +91,15 @@ class UserTestCase(unittest.TestCase):
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
         result = self.client().get(
-            '/api/v1/users/1',
+            '/api/v2/users/1',
             headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 200)
-        res = self.client().delete('api/v1/users/1', headers=dict(Authorization="Bearer " + access_token))
+        res = self.client().delete('api/v2/users/1',
+                                   headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 200)
-        result = self.client().get('api/v1/users/1', headers=dict(Authorization="Bearer " + access_token))
+        result = self.client().get(
+            'api/v2/users/1', headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(result.status_code, 404)
-
 
     def test_admin_can_promote_users(self):
         """Test admin can promote a user (PUT request)."""
@@ -109,9 +107,9 @@ class UserTestCase(unittest.TestCase):
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
         result = self.client().put(
-            '/api/v1/promote/user/1',
+            '/api/v2/promote/user/1',
             headers=dict(Authorization="Bearer " + access_token))
-        self.assertEqual(result.status_code, 200) 
+        self.assertEqual(result.status_code, 200)
 
     def test_nonuser_cannot_promote_users(self):
         """Test non-caterer cannot promote user (PUT request)."""
@@ -120,9 +118,9 @@ class UserTestCase(unittest.TestCase):
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
         result = self.client().put(
-            '/api/v1/promote/user/1',
+            '/api/v2/promote/user/1',
             headers=dict(Authorization="Bearer " + access_token))
-        self.assertEqual(result.status_code, 401) 
+        self.assertEqual(result.status_code, 401)
 
     def test_admin_can_edit_user(self):
         """Test admin can edit existing user. (PUT request)"""
@@ -132,44 +130,51 @@ class UserTestCase(unittest.TestCase):
         self.assertEqual(200, result.status_code)
         access_token = json.loads(result.data.decode())['access_token']
         rv = self.client().put(
-            'api/v1/users/1', headers=dict(Authorization="Bearer " + access_token),
+            'api/v2/users/1', headers=dict(Authorization="Bearer " + access_token),
             data={
                 'username': 'Sharon', 'email': 'sharon@gmail.com', 'password': 'pass1234'
             })
         self.assertEqual(rv.status_code, 200)
-        results = self.client().get('api/v1/users/1', headers=dict(Authorization="Bearer " + access_token))
+        results = self.client().get(
+            'api/v2/users/1', headers=dict(Authorization="Bearer " + access_token))
 
     def test_decode_auth_token(self):
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = 'false access token'
-        res = self.client().put('api/v1/users/1', headers=dict(Authorization="Bearer " + access_token), data=self.user)
+        res = self.client().put('api/v2/users/1',
+                                headers=dict(Authorization="Bearer " + access_token), data=self.user)
         self.assertEqual(res.status_code, 401)
-        res = self.client().get('api/v1/users/1', headers=dict(Authorization="Bearer " + access_token))
+        res = self.client().get('api/v2/users/1',
+                                headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 401)
-        res = self.client().delete('api/v1/users/1', headers=dict(Authorization="Bearer " + access_token))
+        res = self.client().delete('api/v2/users/1',
+                                   headers=dict(Authorization="Bearer " + access_token))
         self.assertEqual(res.status_code, 401)
-        res = self.client().put('api/v1/promote/user/1', headers=dict(Authorization="Bearer " + access_token), data=self.user)
+        res = self.client().put('api/v2/promote/user/1',
+                                headers=dict(Authorization="Bearer " + access_token), data=self.user)
         self.assertEqual(res.status_code, 401)
 
     def test_no_access_token(self):
         result = self.login_admin()
         self.assertEqual(200, result.status_code)
         access_token = None
-        res = self.client().put('api/v1/users/1', headers=dict(Authorization="Bearer "), data=self.user)
+        res = self.client().put('api/v2/users/1',
+                                headers=dict(Authorization="Bearer "), data=self.user)
         self.assertEqual(res.status_code, 401)
-        res = self.client().get('api/v1/users/1', headers=dict(Authorization="Bearer "))
+        res = self.client().get('api/v2/users/1', headers=dict(Authorization="Bearer "))
         self.assertEqual(res.status_code, 401)
         self.assertEqual(res.status_code, 401)
-        res = self.client().delete('api/v1/users/1', headers=dict(Authorization="Bearer "))
+        res = self.client().delete('api/v2/users/1', headers=dict(Authorization="Bearer "))
         self.assertEqual(res.status_code, 401)
-        res = self.client().put('api/v1/promote/user/1', headers=dict(Authorization="Bearer "))
+        res = self.client().put('api/v2/promote/user/1',
+                                headers=dict(Authorization="Bearer "))
         self.assertEqual(res.status_code, 401)
 
     def tearDown(self):
         """teardown all initialized variables."""
         with self.app.app_context():
-            ##drop all tables
+            # drop all tables
             db.session.remove()
             db.drop_all()
 

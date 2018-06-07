@@ -16,7 +16,6 @@ class User(db.Model):
 
     __tablename__ = 'users'
 
-    
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(256), nullable=False)
     email = db.Column(db.String(256), nullable=False, unique=True)
@@ -25,14 +24,11 @@ class User(db.Model):
     orders = db.relationship(
         'Order', order_by='Order.id', cascade="all, delete-orphan")
 
-    
-
     def __init__(self, username, email, password):
         """Initialize the user with an email and a password."""
         self.username = username
         self.email = email
         self.password = Bcrypt().generate_password_hash(password).decode()
-        
 
     def password_is_valid(self, password):
         """
@@ -48,9 +44,9 @@ class User(db.Model):
             db.session.add(self)
             db.session.commit()
         except Exception as error:
-            return {        'message': 'an error occured',
-                            'Error': str(error)
-                }, 400 
+            return {'message': 'an error occured',
+                    'Error': str(error)
+                    }, 400
 
     @staticmethod
     def get_all():
@@ -60,7 +56,6 @@ class User(db.Model):
         """Deletes a given bucketlist."""
         db.session.delete(self)
         db.session.commit()
-
 
     def generate_token(self, user_id):
         """Generates the access token to be used as the Authorization header"""
@@ -108,15 +103,12 @@ class Meal(db.Model):
     price = db.Column(db.Integer())
     # orders = db.relationship(
     #     'Order' ,order_by='Order.id', cascade="all, delete-orphan")
-    
 
     def __init__(self, name, price, description):
         """Initialize the meal with a name and its creator."""
         self.name = name
         self.description = description
         self.price = price
-        
-
 
     def save(self):
         """Save a meal.
@@ -127,30 +119,29 @@ class Meal(db.Model):
             db.session.add(self)
             db.session.commit()
         except Exception as error:
-            return {        'message': 'an error occured',
-                            'Error': str(error)
-                }, 400 
+            return {'message': 'an error occured',
+                    'Error': str(error)
+                    }, 400
 
     @staticmethod
     def get_all():
         return Meal.query.all()
 
-    
     def delete(self):
         """Deletes a given meal."""
         db.session.delete(self)
         db.session.commit()
 
-    def add_to_menu(self):
-        '''method to add meal to todays menu'''
-        Menu.add_meal(self)
+    # def add_to_menu(self):
+    #     '''method to add meal to todays menu'''
+    #     Menu.add_meal(self)
 
     def __repr__(self):
         """Return a representation of a meal instance."""
         return "<Meal: {}>".format(self.meal)
 
     @classmethod
-    def has(cls,**kwargs):
+    def has(cls, **kwargs):
         obj = cls.query.filter_by(**kwargs).first()
         if obj:
             return True
@@ -165,7 +156,6 @@ class Meal(db.Model):
         return {col.name: getattr(self, col.name) for col in self.__table__.columns}
 
 
-
 class Order(db.Model):
     """This class defines the orders table."""
 
@@ -177,7 +167,6 @@ class Order(db.Model):
     quantity = db.Column(db.Integer())
     time_ordered = db.Column(db.DateTime, default=db.func.current_timestamp())
     ordered_by = db.Column(db.Integer, db.ForeignKey(User.id))
-    
 
     def __init__(self, meal, quantity, ordered_by):
         """Initialize the order with a name and its creator."""
@@ -199,26 +188,23 @@ class Order(db.Model):
             db.session.add(self)
             db.session.commit()
         except Exception as error:
-            return {        'message': 'an error occured',
-                            'Error': str(error)
-                }, 400 
+            return {'message': 'an error occured',
+                    'Error': str(error)
+                    }, 400
 
     @staticmethod
     def get_all(user_id):
         """This method gets all the orders for a given user."""
         return Order.query.filter_by(ordered_by=user_id)
 
-    
     def delete(self):
         """Deletes a given order."""
         db.session.delete(self)
         db.session.commit()
 
-    
     def __repr__(self):
         """Return a representation of a order instance."""
         return "<Order: {}>".format(self.meal)
-
 
 
 class Menu(db.Model):
@@ -226,11 +212,11 @@ class Menu(db.Model):
     __tablename__ = 'menu'
 
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.utcnow().date(), unique=True)
+    date = db.Column(
+        db.DateTime, default=datetime.utcnow().date(), unique=True)
     meals = relationship(
         'Meal', secondary='menu_meals', backref=backref('menu_meals', lazy=True, uselist=True))
 
-        
     def add(self, key, value):
         if isinstance(value, list):
             old_value = getattr(self, key)
@@ -249,9 +235,8 @@ class Menu(db.Model):
             menu = Menu()
         if isinstance(meal, Meal):
             meal = [meal]
-        self.meals.extend(meal)
+        self.add('meals', meal)
         self.save()
-    
 
     def save(self):
         """Save a menu.
@@ -262,13 +247,22 @@ class Menu(db.Model):
             db.session.add(self)
             db.session.commit()
         except Exception as error:
-            return {        'message': 'an error occured',
-                            'Error': str(error)
-                }, 400 
+            return {'message': 'an error occured',
+                    'Error': str(error)
+                    }, 400
+
+    def delete(self):
+        """Deletes a given meal."""
+        db.session.delete(self)
+        db.session.commit()
 
     @classmethod
     def get(cls, **kwargs):
         return cls.query.filter_by(**kwargs).first()
+
+    @staticmethod
+    def get_all():
+        return Menu.query.all()
 
     def __repr__(self):
         '''class instance rep'''

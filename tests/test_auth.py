@@ -2,6 +2,7 @@ import unittest
 import json
 from app import create_app, db
 
+
 class AuthTestCase(unittest.TestCase):
     """Test case for the authentication blueprint."""
 
@@ -26,7 +27,7 @@ class AuthTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 201)
 
         result = json.loads(res.data.decode('utf-8'))
-        
+
     def test_already_registered_user(self):
         """Test that a user cannot be registered twice."""
         res = self.client().post('/auth/signup', data=self.user_data)
@@ -45,7 +46,6 @@ class AuthTestCase(unittest.TestCase):
         result = json.loads(login_res.data.decode())
         self.assertEqual(result['message'], "You logged in successfully.")
         self.assertEqual(login_res.status_code, 200)
-        
 
     def test_non_registered_user_login(self):
         """Test non registered users cannot login."""
@@ -59,7 +59,6 @@ class AuthTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 401)
         self.assertEqual(
             result['message'], "Invalid email or password, Please try again.")
-
 
 
 if __name__ == "__main__":
