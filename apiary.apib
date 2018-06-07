@@ -129,11 +129,11 @@ You can login to access your access token by sending a json request with a usern
 
     + Body
 
-        {
-            "ingredients": "Ugali, fish, vegetables, spices",
-            "name": "Ugali and fish",
-            "price": 150
-        }
+            {
+                "ingredients": "Ugali, fish, vegetables, spices",
+                "name": "Ugali and fish",
+                "price": 150
+            }
 
 + Response 201 (application/json)
 
@@ -186,13 +186,12 @@ Caterer could use this to view meals and users too
             "message": "This meal already exists!"
         }
 
-## Meal manipulation [/meals/<int:id>]
+## Meal manipulation [/api/v2/meals/{meal_id}]
 
 ### Get a Meal [GET]
 You get a single meal by specifying its Id. (Caterer only)
 
-+ Parameters
-    + meal_id (required,integer) - Id of the meal to be returned
++ Parmeal_id (required,integer) - Id of the meal to be returned
 
 
 + Request (application/json)
