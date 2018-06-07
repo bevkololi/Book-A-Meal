@@ -99,14 +99,15 @@ You can login to access your access token by sending a json request with a usern
 + Response 201 (application/json)
 
         {
-            'message': 'You registered successfully. Please login.'
+            "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTUyODE5MDczNiwiZXhwIjoxNTI4NDA2NzM2fQ.geMNN5ze24fc23DMQrZlHOvitkrpmeZXraotUmt_MGQ",
+            "message": "You logged in successfully."
         }
 
 
-+ Response 202 (application/json)
++ Response 401 (application/json)
 
         {
-            'message': 'User already exists. Please login.'
+                    'message': 'Invalid email or password, Please try again.'
         }
 
 ### Create a Meal (Caterer Only) [POST]
