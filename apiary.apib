@@ -109,6 +109,7 @@ You can login to access your access token by sending a json request with a usern
         {
                     'message': 'Invalid email or password, Please try again.'
         }
+## Meal resources [/api/v2/meals]
 
 ### Create a Meal (Caterer Only) [POST]
     Add a new Bucket attached to the user. 
@@ -144,7 +145,6 @@ You can login to access your access token by sending a json request with a usern
             "price": 150
         }
 
-## View all meals [api/v2/meals]
 
 ### Get meals [GET]
 
@@ -186,7 +186,7 @@ Caterer could use this to view meals and users too
             "message": "This meal already exists!"
         }
 
-## Meal manipulatio/meals/<int:id>]
+## Meal manipulation [/meals/<int:id>]
 
 ### Get a Meal [GET]
 You get a single meal by specifying its Id. (Caterer only)
