@@ -33,6 +33,10 @@ def create_app(config_name):
     def bad_request(error):
         return make_response(jsonify({'error': BAD_REQUEST}), 400)
 
+    @app.errorhandler(500)
+    def internal_server(error):
+        return make_response(jsonify({'error': 'Oops! Something went wrong. Please contact Caterer for advice.'}), 500)
+
     @app.route('/', methods=['GET'])
     def home():
         return (jsonify('Welcome to Book A Meal'), 200)
@@ -47,8 +51,6 @@ def create_app(config_name):
             if isinstance(user_id, int):
                 if request.method == "POST":
                     current_user = User.query.filter_by(id=user_id).first()
-                    meal_ = Meal.query.filter_by(
-                        name=request.data['name']).first()
                     if current_user.caterer:
                         name = str(request.data.get('name', ''))
                         description = str(request.data.get('description', ''))
@@ -58,6 +60,7 @@ def create_app(config_name):
                         else:
                             return {"message": "Price should be a number"}
                         if name:
+                            meal_ = Meal.query.filter_by(name=request.data['name']).first()                            
                             if meal_:
                                 return jsonify({'message': 'This meal already exists!'})
                             meal = Meal(
@@ -74,7 +77,7 @@ def create_app(config_name):
                             return response
 
                         else:
-                            return jsonify({'message': 'Please input the name of the meal'})
+                            return jsonify({'message': 'Please input the name and description of the meal.'})
 
                     else:
                         response = jsonify(
@@ -697,7 +700,9 @@ def create_app(config_name):
             }
             return make_response(jsonify(response)), 401
 
+
     from .auth import auth_blueprint
     app.register_blueprint(auth_blueprint)
 
+        
     return app
