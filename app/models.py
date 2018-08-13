@@ -101,8 +101,7 @@ class Meal(db.Model):
     name = db.Column(db.String(255))
     description = db.Column(db.String(255))
     price = db.Column(db.Integer())
-    # orders = db.relationship(
-    #     'Order' ,order_by='Order.id', cascade="all, delete-orphan")
+    
 
     def __init__(self, name, price, description):
         """Initialize the meal with a name and its creator."""
@@ -132,10 +131,7 @@ class Meal(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    # def add_to_menu(self):
-    #     '''method to add meal to todays menu'''
-    #     Menu.add_meal(self)
-
+    
     def __repr__(self):
         """Return a representation of a meal instance."""
         return "<Meal: {}>".format(self.meal)
