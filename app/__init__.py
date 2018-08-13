@@ -35,7 +35,7 @@ def create_app(config_name):
 
     @app.errorhandler(500)
     def internal_server(error):
-        return make_response(jsonify({'error': 'Oops! Something went wrong. Please contact Caterer for advice. NB:Ensure that you input access token for verification'.}), 500)
+        return make_response(jsonify({'error': 'Oops! Something went wrong. Please contact Caterer for advice. NB:Ensure that you input access token for verification.'}), 500)
 
     @app.route('/', methods=['GET'])
     def home():
